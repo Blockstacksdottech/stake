@@ -1,9 +1,10 @@
 import { useWeb3React } from '@web3-react/core';
 import React , {useEffect,useState} from 'react';
-import {calculateAP, loadContract, round, toFixed} from '../utils';
+import {calculateAP, formatNumber, loadContract, round, toFixed} from '../utils';
 import { bep20, pool } from '../wallet/abis';
 import { pooladd, token } from '../wallet/addresses';
 import {  useToasts } from 'react-toast-notifications';
+import Web3  from 'web3';
 
 
 
@@ -84,7 +85,8 @@ function StakeCard(props:any){
         let value = getAmount();
         
         if (value){
-            c.methods.approve(pooladd,String(value*(10**18))).send({from:account}).on('receipt',(receipt:any) => {
+          console.log( Web3.utils.toWei(String(value),'ether'));
+            c.methods.approve(pooladd,Web3.utils.toWei(String(value),'ether')).send({from:account}).on('receipt',(receipt:any) => {
                 addToast("Transaction Confirmed", {
                     appearance: 'success',
                     autoDismiss: true,
@@ -115,7 +117,7 @@ function StakeCard(props:any){
         let value = getAmount();
         
         if (value){
-            c.methods.deposit(String(value*(10**18)),getRange(),account).send({from:account}).on('receipt',(receipt:any) => {
+            c.methods.deposit(Web3.utils.toWei(String(value),'ether'),getRange(),account).send({from:account}).on('receipt',(receipt:any) => {
                 addToast("Transaction Confirmed", {
                     appearance: 'success',
                     autoDismiss: true,
@@ -180,7 +182,7 @@ function StakeCard(props:any){
           </div>
           <div className="form-group mt-3">
             <label className="float-left">Amount</label>
-            {active ? <label className="float-right">Balance: {toFixed(balance / 10**18)}</label> : '' }
+            {active ? <label className="float-right">Balance: {formatNumber(toFixed(balance / 10**18))}</label> : '' }
             
             <div className="input-group">
               <input type="text" id='amount' disabled={active &&  balance != 0 ? false : true} placeholder="0" className="form-control input-amount"   />
@@ -197,7 +199,7 @@ function StakeCard(props:any){
             {active ? <div className="row">
             <div className="col-md-12">
               <h4 className="float-left">Est. APR</h4>
-              <h4 className="float-right">{APR}%</h4>
+              <h4 className="float-right">{round(props.rate * (1+duration /52))}%</h4>
             </div>
           </div> : ""}
           

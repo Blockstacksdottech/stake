@@ -1,7 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import React , {useState} from 'react';
 import { Modal } from 'react-bootstrap';
-import { injected } from '../wallet/connectors';
+import { injected , walletconnect } from '../wallet/connectors';
 
 
 
@@ -11,7 +11,7 @@ function ModalConnect({show,setShow}:any){
     
     
  
-    async function connect(){
+    async function connectInjected(){
         try{
             await activate(injected);
             setShow(false);
@@ -19,6 +19,15 @@ function ModalConnect({show,setShow}:any){
             console.log(exc);
         }
     }
+
+    async function connectWalletConnect(){
+      try{
+        await activate(walletconnect);
+        setShow(false);
+    }catch (exc){
+        console.log(exc);
+    
+    }}
 
     const html = (
 
@@ -32,7 +41,7 @@ function ModalConnect({show,setShow}:any){
               </Modal.Header>
               <Modal.Body className="bg-black">
               <ul className="list-group">
-                  <li onClick = {connect} className="
+                  <li onClick = {connectInjected} className="
                       list-group-item
                       d-flex
                       justify-content-between
@@ -42,6 +51,16 @@ function ModalConnect({show,setShow}:any){
                     Metamask
                     <img src="assets/img/metamask.png" />
                   </li>
+                 {/*  <li onClick = {connectWalletConnect} className="
+                      list-group-item
+                      d-flex
+                      justify-content-between
+                      align-items-center
+                      wallet-list
+                    ">
+                    WalletConnect
+                    <img src="assets/img/walletconnect.svg" />
+                  </li> */}
                 </ul>
               </Modal.Body>
         </Modal>

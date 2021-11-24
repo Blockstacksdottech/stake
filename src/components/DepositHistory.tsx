@@ -73,7 +73,7 @@ function DepositHistory(props:any){
           </thead>
           <tbody>
             {deposits.map((e:any,i:number) => {
-                let [date,time] = timeConverter(e[1]);
+                let [date,time] = timeConverter(e[2]);
                 return (
                 <tr>
                 <th scope="row">{i}</th>

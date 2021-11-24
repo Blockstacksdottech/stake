@@ -49,6 +49,20 @@ function Reward(props:any){
         })
     }
 
+    function getRewardRate(){
+      let avgduration = 0;
+      if (props.deposits.length > 0){
+        for (let i = 0; i < props.deposits.length ; i++){
+          avgduration += (props.deposits[i][2] - props.deposits[i][1])
+        }
+        avgduration /= props.deposits.length;
+        avgduration /= 3600;
+      }
+      
+      return avgduration;
+
+    }
+
 
     useEffect(()=>{
         (async () => {
@@ -80,23 +94,23 @@ function Reward(props:any){
             <h4>{toFixed(reward / 10 **18)}</h4>
             <span>Open Claims</span>
           </div>
-          <div className="col-md-4">
+          { active && library ?  <div className="col-md-4">
             <button onClick={claimRewards} type="button" className="btn btn-approve btn-block">
               Claim
             </button>
-          </div>
+          </div> : ''}
         </div>
       </div>
       <div className="card-body">
         <div className="row">
           <div className="col-md-6 mx-auto">
             <img src="assets/img/trophy.png" />
-            <h1 className="mt-2">5.35</h1>
+            <h1 className="mt-2">{ active   ?  toFixed(reward /(10**18*4)) :0 } </h1>
             <small>per week</small>
           </div>
           <div className="col-md-6 mx-auto">
             <img src="assets/img/trophy.png" />
-            <h1 className="mt-2">22.39</h1>
+            <h1 className="mt-2">{ active   ?  toFixed(reward/10**18) : 0 }</h1>
             <small>per month</small>
           </div>
         </div>
@@ -105,7 +119,7 @@ function Reward(props:any){
         <div className="row">
           <div className="col-md-12">
             <p className="text-center pt-2">
-              <small>Your approximate reward (by $34.06)</small>
+              <small>Your approximate reward (by ${ active ? toFixed((reward / (10**18 *  4))) * props.price : 0  })</small>
             </p>
           </div>
         </div>

@@ -64,3 +64,27 @@ export function timeConverter(timestamp:number){
     var time =  hour + ':' + min + ':' + sec ;
     return  [dt , time];
   }
+
+
+export async function getPrice(){
+    let idd = "chainlink";
+    let vs = "usd";
+    let resp:any = await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+idd+'&vs_currencies='+vs);
+    let data:any = await resp.json();
+    return data.chainlink.usd;
+
+}
+
+
+export function formatNumber(num:any)
+{
+    num = num.toFixed(2) + '';
+    let x = num.split('.');
+    let x1 = x[0];
+    let x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+}
