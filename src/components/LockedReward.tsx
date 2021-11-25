@@ -15,7 +15,7 @@ function LockedReward(props:any){
     const [Symbol,setSymbol] = useState("ABC");
 
     async function withdraw(i:number){
-        let c = loadContract(library,pool,pooladd);
+        let c = loadContract(library,pool,escrowadd);
         c.methods.withdraw(String(i),account).send({from:account}).on('receipt',(receipt:any) => {
             addToast("Transaction Confirmed", {
                 appearance: 'success',
