@@ -5,6 +5,6 @@ export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 
 
 
 export const walletconnect = new WalletConnectConnector({
-    rpc: { 97: "https://data-seed-prebsc-1-s2.binance.org:8545/" },
+    rpc: { 4: "https://rinkeby.infura.io/v3/5943806f71034503bbbb49413ffbbe15" },
     qrcode: true
   })

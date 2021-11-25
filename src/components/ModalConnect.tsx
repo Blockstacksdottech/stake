@@ -35,12 +35,12 @@ function ModalConnect({show,setShow}:any){
         <Modal  show={show} onHide={setShow}>
               <Modal.Header className="bg-black">
               <h4 className="modal-title" id="exampleModalLabel">Select Wallet</h4>
-                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                {/* <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span>
-                </button>
+                </button> */}
               </Modal.Header>
               <Modal.Body className="bg-black">
-              <ul className="list-group">
+              <ul className="list-group connectors-list">
                   <li onClick = {connectInjected} className="
                       list-group-item
                       d-flex
@@ -49,9 +49,9 @@ function ModalConnect({show,setShow}:any){
                       wallet-list
                     ">
                     Metamask
-                    <img src="assets/img/metamask.png" />
+                    <img className='wallet-logo' src="assets/img/metamask.png" />
                   </li>
-                 {/*  <li onClick = {connectWalletConnect} className="
+                  <li onClick = {connectWalletConnect} className="
                       list-group-item
                       d-flex
                       justify-content-between
@@ -59,8 +59,8 @@ function ModalConnect({show,setShow}:any){
                       wallet-list
                     ">
                     WalletConnect
-                    <img src="assets/img/walletconnect.svg" />
-                  </li> */}
+                    <img className="wallet-logo" src="assets/img/walletconnect.svg" />
+                  </li>
                 </ul>
               </Modal.Body>
         </Modal>

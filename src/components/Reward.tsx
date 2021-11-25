@@ -1,6 +1,6 @@
 import { useWeb3React } from '@web3-react/core';
 import React , {useEffect,useState} from 'react';
-import { loadContract, toFixed } from '../utils';
+import { loadContract, round, toFixed } from '../utils';
 import { bep20, pool } from '../wallet/abis';
 import { pooladd, token } from '../wallet/addresses';
 import {  useToasts } from 'react-toast-notifications';
@@ -46,7 +46,7 @@ function Reward(props:any){
                 appearance: 'error',
                 autoDismiss: true,
               })
-        })
+        }).then((resp:any) => console.log(resp))
     }
 
     function getRewardRate(){
@@ -87,11 +87,11 @@ function Reward(props:any){
             <i className="fa fa-circle fa-3x" />
           </div>
           <div className="col-md-3">
-            <h4>{toFixed(staked/ 10**18)}</h4>
+            <h4>{toFixed(round(staked/ 10**18))}</h4>
             <span>{Symbol} Staked</span>
           </div>
           <div className="col-md-3">
-            <h4>{toFixed(reward / 10 **18)}</h4>
+            <h4>{toFixed(round(reward / 10 **18))}</h4>
             <span>Open Claims</span>
           </div>
           { active && library ?  <div className="col-md-4">
@@ -105,12 +105,12 @@ function Reward(props:any){
         <div className="row">
           <div className="col-md-6 mx-auto">
             <img src="assets/img/trophy.png" />
-            <h1 className="mt-2">{ active   ?  toFixed(reward /(10**18*4)) :0 } </h1>
+            <h1 className="mt-2">{ active   ?  toFixed( round(reward /(10**18*4))) :0 } </h1>
             <small>per week</small>
           </div>
           <div className="col-md-6 mx-auto">
             <img src="assets/img/trophy.png" />
-            <h1 className="mt-2">{ active   ?  toFixed(reward/10**18) : 0 }</h1>
+            <h1 className="mt-2">{ active   ?  toFixed(round(reward/10**18)) : 0 }</h1>
             <small>per month</small>
           </div>
         </div>
@@ -119,7 +119,7 @@ function Reward(props:any){
         <div className="row">
           <div className="col-md-12">
             <p className="text-center pt-2">
-              <small>Your approximate reward (by ${ active ? toFixed((reward / (10**18 *  4))) * props.price : 0  })</small>
+              <small>Your approximate reward (by ${ active ? toFixed(round((reward / (10**18 *  4)) * props.price)) : 0  })</small>
             </p>
           </div>
         </div>

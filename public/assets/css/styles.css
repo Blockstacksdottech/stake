@@ -64,6 +64,27 @@
   box-sizing: border-box;
 }
 
+.connectors-list li{
+  margin:10px 5px;
+  cursor: pointer;
+  filter : scale(1);
+  transition: filter 1s linear;
+  border-radius: 10px !important;
+
+}
+
+.connectors-list li:hover{
+  filter:scale(1.5) !important;
+}
+
+
+.wallet-logo{
+  width:24px;
+}
+
+
+
+
 .fa-circle {
   color: #C94347;
 }
@@ -5272,9 +5293,9 @@ textarea.form-control-lg {
   background-color: #0d6efd;
   border-color: #0d6efd;
 }
-.list-group-item + .list-group-item {
+/* .list-group-item + .list-group-item {
   border-top-width: 0;
-}
+} */
 .list-group-item + .list-group-item.active {
   margin-top: -1px;
   border-top-width: 1px;

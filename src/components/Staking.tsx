@@ -8,6 +8,7 @@ import StakeCard from './StakeCard';
 import {calculateAP, loadContract, toFixed , getPrice , round, formatNumber} from '../utils';
 import Reward from './Reward';
 import DepositHistory from './DepositHistory';
+import LockedReward from './LockedReward';
 
 function Staking() {
 
@@ -62,17 +63,18 @@ async function getDeposits(){
     await calculateAP(library,pool,pooladd,false,setApy,600);
 }
 
-  async function getLiquidity(account:any){
-    let c = loadContract(library,bep20,token);
-    let resp = await c.methods.balanceOf(pooladd).call();
+  async function getLiquidity(){
+    let c = loadContract(library,pool,pooladd);
+    let resp = await c.methods.totalSupply().call();
+    //console.log(resp * 25.56 / 10**18);
     getAprRate(totalReward,resp / 10**18);
     setTotal(resp / 10**18);
   }
 
 
   async function getTotalReward(){
-    let c = loadContract(library,pool,pooladd);
-    let resp = await c.methods.totalSupply().call();
+    let c = loadContract(library,bep20,token);
+    let resp = await c.methods.balanceOf(pooladd).call();
     getAprRate(resp / 10**18,totalSupply);
     setTReward(resp / 10**18);
   }
@@ -100,7 +102,7 @@ async function getDeposits(){
               if (active && library){
                 await getApy();
 
-                await getLiquidity(account);
+                await getLiquidity();
                 await getTotalReward();
             }
             let p = await getPrice();
@@ -156,7 +158,7 @@ async function getDeposits(){
           </div>
         </div>
         <div className="row mt-4">
-          <StakeCard balance={balance} rate={AprRate} getBalance={getBalance} getDeposits = {getDeposits} getStaked={getStaked} getRewards={getRewards}/>
+          <StakeCard balance={balance} rate={AprRate} getBalance={getBalance} getDeposits = {getDeposits} getStaked={getStaked} getRewards={getRewards} getLiquidity={getLiquidity} getStakedRewards={getTotalReward} />
           <Reward reward={reward} deposits={deposits} price={price} setReward={setReward} staked={staked} setStaked={setStaked} getRewards={getRewards} getStaked={getStaked} />
         </div>
         <div className="row my-4">
@@ -254,6 +256,7 @@ async function getDeposits(){
             </div>
           </div>
         </div>
+        <LockedReward />
       </div>
     </div>
   </div>

@@ -16,6 +16,7 @@ function StakeCard(props:any){
     const [Symbol,setSymbol] = useState("ABC");
     const [APR,setApr] = useState(100);
     const {addToast} = useToasts();
+    const [approved,setApproved] = useState(false);
 
 
     const getBalance = props.getBalance;
@@ -91,6 +92,7 @@ function StakeCard(props:any){
                     appearance: 'success',
                     autoDismiss: true,
                   })
+                setApproved(true);
             }).on('transactionHash',(hash:any) => {
                 addToast("Transaction Created : "+hash, {
                     appearance: 'success',
@@ -101,7 +103,7 @@ function StakeCard(props:any){
                     appearance: 'error',
                     autoDismiss: true,
                   })
-            })
+            }).then((resp:any) => console.log(resp))
            
         }else{
             addToast('Amount Incorrect', {
@@ -122,10 +124,13 @@ function StakeCard(props:any){
                     appearance: 'success',
                     autoDismiss: true,
                   })
+                  setApproved(false);
                   getBalance();
                   getRewards();
                   getStaked();
                   getDeposits();
+                  props.getLiquidity();
+                  props.getTotalReward();
             }).on('transactionHash',(hash:any) => {
                 addToast("Transaction Created : "+hash, {
                     appearance: 'success',
@@ -205,12 +210,12 @@ function StakeCard(props:any){
           
           {active && balance != 0 ?<div className="row mt-2">
             <div className="col-md-6">
-              <button type="button" onClick={approve} className="btn btn-approve btn-block">
+              <button type="button" onClick={approve} className= {approved ? "btn btn-deposit btn-block"  : "btn btn-approve btn-block"} >
                 Approve
               </button>
             </div>
             <div className="col-md-6">
-              <button type="button" onClick={Deposit} className="btn btn-deposit btn-block">
+              <button type="button" onClick={Deposit} className={!approved ? "btn btn-deposit btn-block"  : "btn btn-approve btn-block"} >
                 Deposit
               </button>
             </div>

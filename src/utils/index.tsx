@@ -4,6 +4,7 @@ export function round(num:number){
 
 
 export function loadContract(w3:any,abi:any,address:string){
+    console.log(w3);
     return new w3.eth.Contract(abi,address);
 }
 
