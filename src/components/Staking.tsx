@@ -92,6 +92,16 @@ async function getDeposits(){
     }
   }
 
+  function handleToggle(){
+    let cl = "sb-sidenav-toggled";
+    let body = document.querySelector('body');
+    if (body?.classList.contains(cl)){
+      body.classList.remove(cl);
+    }else{
+      body?.classList.add(cl);
+    }
+  }
+
    
 
     useEffect(
@@ -127,7 +137,7 @@ async function getDeposits(){
     {/* Top navigation*/}
     <nav className="navbar navbar-expand-lg bg-dark">
       <div className="container-fluid">
-        <i className="fa fa-bars fa-2x" id="sidebarToggle" />
+        <i  onClick={handleToggle} className="fa fa-bars fa-2x" id="sidebarToggle" />
         <ul className="navbar-nav ms-auto">
          {/*  <li className="nav-item">
             <a className="nav-link btn btn-sm btn-123 mr-5px" href="#!">123 <span className="fa fa-gas-pump" /></a>
