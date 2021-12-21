@@ -1,7 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import React , {useState} from 'react';
 import { Modal } from 'react-bootstrap';
-import { injected , walletconnect } from '../wallet/connectors';
+import { injected , walletconnect } from '../../wallet/connectors';
 
 
 

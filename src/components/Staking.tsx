@@ -1,16 +1,21 @@
+
+
+
+
 import { useWeb3React } from '@web3-react/core';
 import React , {useEffect,useState} from 'react';
 import { bep20, pool } from '../wallet/abis';
 import { pooladd, token } from '../wallet/addresses';
-import ModalConnect from './ModalConnect';
-import Sidebar from './Sidebar';
-import StakeCard from './StakeCard';
+import ModalConnect from './GeneralComponents/ModalConnect';
+import Sidebar from './GeneralComponents/Sidebar';
+import StakeCard from './StakingComponents/StakeCard';
 import {calculateAP, loadContract, toFixed , getPrice , round, formatNumber} from '../utils';
-import Reward from './Reward';
-import DepositHistory from './DepositHistory';
-import LockedReward from './LockedReward';
+import Reward from './StakingComponents/Reward';
+import DepositHistory from './StakingComponents/DepositHistory';
+import LockedReward from './StakingComponents/LockedReward';
+import TopNav from './GeneralComponents/TopNav';
 
-function Staking() {
+function Staking(props:any) {
 
     const { active,account , deactivate ,library } = useWeb3React();
     const [balance,setBalance] = useState(0);
@@ -25,12 +30,12 @@ function Staking() {
     const [AprRate,setAprRate] = useState(0);
 
     async function disconnect(){
-        try {
-            deactivate();
-        }catch (exc){
-            console.log(exc);
-        }
-    }
+      try {
+          deactivate();
+      }catch (exc){
+          console.log(exc);
+      }
+  }
 
 
     async function getBalance(){
@@ -92,15 +97,7 @@ async function getDeposits(){
     }
   }
 
-  function handleToggle(){
-    let cl = "sb-sidenav-toggled";
-    let body = document.querySelector('body');
-    if (body?.classList.contains(cl)){
-      body.classList.remove(cl);
-    }else{
-      body?.classList.add(cl);
-    }
-  }
+  
 
    
 
@@ -135,20 +132,7 @@ async function getDeposits(){
     const html = (
   <div id="page-content-wrapper">
     {/* Top navigation*/}
-    <nav className="navbar navbar-expand-lg bg-dark">
-      <div className="container-fluid">
-        <i  onClick={handleToggle} className="fa fa-bars fa-2x" id="sidebarToggle" />
-        <ul className="navbar-nav ms-auto">
-         {/*  <li className="nav-item">
-            <a className="nav-link btn btn-sm btn-123 mr-5px" href="#!">123 <span className="fa fa-gas-pump" /></a>
-          </li> */}
-          <li className="nav-item">
-            {active ? <a className="nav-link btn btn-sm btn-connect" onClick={disconnect}  >Disconnect</a>
-             : <a className="nav-link btn btn-sm btn-connect" onClick={() => {setShow(!show)}}  data-toggle="modal" data-target="#ConnectModal">Connect Wallet</a>}
-          </li>
-        </ul>
-      </div>
-    </nav>
+      <TopNav show={[show,setShow]} />
     {/* Page content*/}
     <div className="right-side">
       <div className="container-fluid">
@@ -278,7 +262,7 @@ async function getDeposits(){
 
 
     return <div className="d-flex" id="wrapper">
-        <Sidebar />
+        <Sidebar current={props.current}/>
         {html}
         <ModalConnect show={show} setShow={setShow} />
     </div>;

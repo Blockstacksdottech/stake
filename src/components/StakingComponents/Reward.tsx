@@ -1,8 +1,8 @@
 import { useWeb3React } from '@web3-react/core';
 import React , {useEffect,useState} from 'react';
-import { loadContract, round, toFixed } from '../utils';
-import { bep20, pool } from '../wallet/abis';
-import { pooladd, token } from '../wallet/addresses';
+import { loadContract, round, toFixed } from '../../utils';
+import { bep20, pool } from '../../wallet/abis';
+import { pooladd, token } from '../../wallet/addresses';
 import {  useToasts } from 'react-toast-notifications';
 
 
