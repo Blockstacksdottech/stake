@@ -22,7 +22,7 @@ function Sidebar(props:any){
     <Link className= {props.current=='stake' ? "btn btn-lg btn-sidebar active" : "btn btn-lg btn-sidebar" }   to="/"><span className="fa fa-wallet icon" />Transaction</Link>
     <Link className={props.current=='swap' ? "btn btn-lg btn-sidebar active" : "btn btn-lg btn-sidebar" }  to="/swap"><span className="fa fa-sync icon" />Swap</Link>
     <a className="btn btn-lg btn-sidebar" href="#!"><span className="fa fa-coins icon" />Liquidity</a>
-    <a className="btn btn-lg btn-sidebar" href="#!"><span className="fa fa-seedling icon" />Farm</a>
+    <Link className={props.current=='farm' ? "btn btn-lg btn-sidebar active" : "btn btn-lg btn-sidebar" }  to="/farm"><span className="fa fa-seedling icon" />Farm</Link>
     <a className="btn btn-lg btn-sidebar" href="#!"><span className="fa fa-link icon" />Bridge</a>
     <a className="btn btn-lg btn-sidebar" href="#!"><span className="fa fa-piggy-bank icon" />Staking</a>
     {active ? <a onClick={disconnect} className="btn btn-lg btn-logout bottom-position"><span className="fa fa-sign-out-alt icon"  />Logout</a> : ''}

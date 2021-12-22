@@ -6,6 +6,7 @@ import {
   Route
 } from "react-router-dom";
 import Swap from './components/Swap';
+import Farm from './components/Farm';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Staking current="stake" />} />
       <Route path="/swap" element={<Swap current="swap" />} />
+      <Route path="/farm" element={<Farm current="farm" />} />
     </Routes>
   </BrowserRouter>
     

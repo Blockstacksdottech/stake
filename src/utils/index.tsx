@@ -1,3 +1,5 @@
+import { getAddress } from "@ethersproject/address";
+
 export function round(num:number){
     return Math.round((num + Number.EPSILON) * 100) / 100
 }
@@ -88,4 +90,12 @@ export function formatNumber(num:any)
         x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
     return x1 + x2;
+}
+
+export function isAddress(value: any): string | false {
+	try {
+		return getAddress(value);
+	} catch {
+		return false;
+	}
 }

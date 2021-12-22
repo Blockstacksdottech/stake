@@ -1,14 +1,19 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect,useState,Fragment} from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Sidebar from './GeneralComponents/Sidebar';
 import ModalConnect from './GeneralComponents/ModalConnect';
 import TopNav from './GeneralComponents/TopNav';
 import _ from "lodash";
+import { loadContract } from '../utils';
+import { BigNumber } from "@0x/utils";
+
+import { assert } from "@0x/assert";
 
 import { walletTokens as toks } from "../constants/spot-config/mainnet/config.json";
 
 import {
-	BTC,CHANGE_NOW_FLOW,SIDE_SHIFT_TYPE,supportedDEXes,SIMPLE_SWAP_FIXED
+	BTC,CHANGE_NOW_FLOW,SIDE_SHIFT_TYPE,supportedDEXes,SIMPLE_SWAP_FIXED,DEXesImages,
+  ZERO
 } from "../constants";
 
 import InstantSwapApi from "../http/instantSwap";
@@ -16,6 +21,9 @@ import InstantSwapApi from "../http/instantSwap";
 import CoinModal from "./SwapingComponents/CoinModal";
 import SwapCard from "./SwapingComponents/SwapCard";
 import {  useToasts } from 'react-toast-notifications';
+import Load from './GeneralComponents/Load';
+import { selectClasses } from '@mui/material';
+import { ERC20_ABI } from '../constants/abis/erc20';
 
 function Swap(props:any){
 
@@ -30,22 +38,44 @@ function Swap(props:any){
       loaded:0
     });
     const [fetchloading, setFetchLoading] = useState(false);
-    const [result,setResult] = useState();
+    const [result,setResult]:any = useState(null);
     const {addToast} = useToasts();
     const api:any = InstantSwapApi;
-    const [tokens , setTokens] = useState([...toks,BTC])
+    const [tokens , setTokens] = useState([...toks])
+    const [max,setMax]  = useState(0);
+    const [priceInterval,setPriceInterval]:any = useState(null);
+    const [selectedRate,setSelectedRate] = useState(NaN);
+    const [BuyState,setBuyState] = useState("");
 
+
+    const onChangeBalance = (balance:any,side:any) => {
+      if (side == "from" && from){
+        let temp = {...from};
+        temp.max = balance;
+        setFrom(temp);
+      }else if (side == "to" && to){
+        let temp={...to}
+        temp.max = balance;
+        setTo(temp);
+      }
+    };
 
     async function handleSelect(i:number){
       console.log(tokens[i]);
-      let temp = {...tokens[i],value:0};
+      let temp = {...tokens[i],value:0,max:0};
       let resp;
       if (side == "from"){
         setFrom(temp);
-        resp = await fetchPrices(temp,to);
+        if (to){
+          resp = await fetchPrices(temp,to);
+        }
+        
       }else if (side == "to"){
         setTo(temp);
-        resp = await fetchPrices(from,temp);
+        if(from){
+          resp = await fetchPrices(from,temp);
+      }
+        
       }
       console.log(resp);
 
@@ -307,38 +337,65 @@ function Swap(props:any){
           } else if (destination.value) {
             deposit.value = (destination.value / result[0].rate).toFixed(6);
           }
-          //updatePriceIntervally(deposit, destination);
+          updatePriceIntervally(deposit, destination);
         } else {
           addToast('Unavailable Pair', {
             appearance: 'error',
             autoDismiss: true,
           })
         }
-        console.log({
+        let res:any = {
           destination,
           deposit,
           rates: result,
           rate: result.length > 0 ? result[0] : undefined,
-          loading: false,
           showMore: false,
-          
-        });
+          hasEnough: Number(from.value) <= Number(from.max)
+        }
+        console.log(res);
+        setFrom(deposit);
+        setTo(destination);
+        setResult(res);
+        setSelectedRate(res.rate);
+        setFetchLoading(false);
+        setLoading({
+          all:36,
+          loaded:0
+        })
+        addToast('Loaded', {
+          appearance: 'success',
+          autoDismiss: true,
+        })
+
       } else {
         /* setState({
           pair,
           showMore: false,
         }); */
+
+        let res = {
+          destination,
+          deposit,
+          showMore: false,
+          hasEnough: false
+        }
+
+        setFrom(deposit);
+        setTo(destination);
+        setResult(res);
+        setFetchLoading(false);
+        setLoading({
+          all:36,
+          loaded:0
+        })
         console.log('else error');
       }
     };
 
-    /* const getNewPrice = async (deposit, destination) => {
+    const getNewPrice = async (deposit:any, destination:any) => {
       const { t } = props;
   
       if (deposit !== null && destination !== null) {
-        setState({
-          priceLoading: true,
-        });
   
         let promises = getPricesPromises(deposit, destination);
   
@@ -355,44 +412,306 @@ function Swap(props:any){
             deposit.value = (destination.value / result[0].rate).toFixed(6);
           }
         } else {
-          toast.error(t("errors.unavailablePair"));
+          addToast('Unavailable Pair', {
+            appearance: 'error',
+            autoDismiss: true,
+          });
         }
   
-        setState(prevState => {
+        
           let newRate = result[0];
-          if(prevState.rate?.hasOwnProperty('platform')) {
-            const newRes = result.find(_ => _.platform === prevState.rate.platform);
-            if(newRes) {
-              newRate = newRes;
-            }
-          }
-          return {
+          
+          
+          let res:any =  {
+            destination,
+            deposit,
             rates: result,
             rate: result.length > 0 ? newRate : undefined,
             priceLoading: false,
             hasEnoughBalance:
-              !prevState.max || Number(deposit.value) <= Number(prevState.max.toSignificant(6)),
+            Number(from.value) <= Number(from.max),
           }
-        });
+
+          setResult(res);
+          setSelectedRate(res.rate);
       }
     }
 
 
-    const updatePriceIntervally = (deposit, destination) => {
-      let priceInterval;
-      if(priceInterval) {
-        clearInterval(priceInterval);
-        priceInterval = null;
+    const updatePriceIntervally = (deposit:any, destination:any) => {
+      let pI = priceInterval;
+      if(pI) {
+        clearInterval(pI);
+        pI = null;
       }
-      priceInterval = setInterval(() => {
+      pI = setInterval(() => {
         getNewPrice(deposit, destination);
       }, 15000)
-    } */
+      setPriceInterval(pI);
+    }
+
+    const forceRefreshPrices = async () => {
+      let deposit = from;
+      let destination = to;
+      let Pi = priceInterval;
+      if(Pi) {
+        clearInterval(Pi);
+        Pi = null;
+      }
+      await getNewPrice(deposit, destination);
+      updatePriceIntervally(deposit, destination);
+    }
 
     function handleValue(e:any,side:string){
       let v = e.target.value;
+      console.log(v);
+      if (side == "from"){
+        let temp = {...from};
+        temp.value = Number(v);
+        setFrom(temp);
+      }
     }
 
+    const HEX_REGEX = /^0x[0-9A-F]*$/i;
+
+    function isHexString(str:string) {
+      if (HEX_REGEX.test(str)) {
+        return true;
+      } else {
+        throw new Error("Entered value isn't hex string");
+      }
+    }
+
+    
+
+    const oneInchBuyHandler = async (deposit:any,destination:any, rate:any) => {
+      try {
+        let canExchange = false;
+        let pending = false;
+        setBuyState("initializing");
+        let allowance = ZERO;
+  
+        const spenderRes = await api.oneInch.get("spender");
+        const spender = spenderRes.data.address;
+  
+        let fromAmount = new BigNumber(deposit.value).times(10 ** deposit.token.decimals);
+  
+        if (deposit.token.symbol.toUpperCase() !== "ETH") {
+          setBuyState("allowance");
+  
+          let contract = loadContract(
+            library,
+            ERC20_ABI,
+            deposit.address
+          );
+  
+          allowance = await contract.methods.allowance(account, spender);
+          allowance = new BigNumber(allowance);
+  
+          if (fromAmount.isGreaterThan(allowance)) {
+            setBuyState("approving");
+  
+            const maxAllowance = new BigNumber(2).pow(256).minus(1);
+            contract.methods.approve(spender, maxAllowance.toFixed(0)).on('receipt',(receipt:any) =>{
+              pending = false;
+              canExchange = true;
+            }).on('error',(err:any) => {
+              pending = true;
+              canExchange = false
+            })
+            
+
+          
+          } else {
+            canExchange = true;
+          }
+        } else {
+          canExchange = true;
+        }
+  
+        if (canExchange) {
+          if (deposit.token.symbol.toUpperCase() !== "ETH" && pending) {
+            let contract = loadContract(
+              library,
+            ERC20_ABI,
+            deposit.address
+            );
+  
+            allowance = await contract.methods.allowance(account, spender);
+            allowance = new BigNumber(allowance);
+  
+            if (fromAmount.isGreaterThan(allowance)) {
+              addToast('Approval Pending', {
+                appearance: 'error',
+                autoDismiss: true,
+              });
+              return false;
+            }
+          }
+  
+          setBuyState("create_tx");
+  
+          const res = await api.oneInch.get("swap", {
+            fromTokenAddress: deposit.token.address,
+            toTokenAddress: destination.token.address,
+            amount: fromAmount.toFixed(0),
+            fromAddress: account,
+            slippage: 2 / 100,
+            destReceiver: undefined,
+          });
+          const tx = res.data.tx;
+  
+          setBuyState("send_tx");
+  
+          library.eth.sendTransaction(tx, async (err:any, transactionHash:any) => {
+            if (err) {
+              setBuyState("failed");
+  
+  
+              if (err.code === 4001) {
+                addToast("errors.canceled", {
+                  appearance: 'error',
+                  autoDismiss: true,
+                });
+                
+              } else {
+                addToast("errors.default", {
+                  appearance: 'error',
+                  autoDismiss: true,
+                });
+              }
+              //isExchangeInProgress = false;
+              return false;
+            }
+  
+            setBuyState("submitted");
+  
+            //this.setDefaultBuyState();
+            //this.isExchangeInProgress = false;
+            //toast.success(t("instantSwap.orderSubmitted"));
+            addToast("instantSwap.orderSubmitted", {
+              appearance: 'success',
+              autoDismiss: true,
+            });
+            /* if (typeof transactionHash === "string") {
+              this.props.addTransaction({
+                chainId: ChainId.MAINNET,
+                addedTime: Date.now(),
+                hash: transactionHash,
+                from: this.props.web3.account,
+              });
+            } */
+          });
+        } else {
+          //toast.error(t("errors.approvalPending"));
+          addToast("errors.approvalPending", {
+            appearance: 'error',
+            autoDismiss: true,
+          });
+        }
+        //this.isExchangeInProgress = false;
+      } catch (e:any) {
+        setBuyState("failed");
+  
+        //this.setDefaultBuyState();
+  
+        //this.isExchangeInProgress = false;
+  
+        if (e.hasOwnProperty("code")) {
+          if (e.code === 4001) {
+           //toast.error(t("errors.canceled"));
+            addToast("errors.canceled", {
+              appearance: 'error',
+              autoDismiss: true,
+            });
+          } else {
+           // toast.error(t("errors.default"));
+            addToast("errors.default", {
+              appearance: 'error',
+              autoDismiss: true,
+            });
+          }
+        } else {
+          if (e.hasOwnProperty("response")) {
+            if (e.response.status === 500) {
+              if (e.response.data.hasOwnProperty("errors")) {
+                e.response.data.errors.map((err:any) => {
+                  //toast.error(err.msg);
+                  addToast(err.msg, {
+                    appearance: 'error',
+                    autoDismiss: true,
+                  });
+                });
+              } else {
+                //toast.error(t("errors.unavailablePair"));
+                addToast("errors.unavailablePair", {
+                  appearance: 'error',
+                  autoDismiss: true,
+                });
+              }
+            } else {
+             // toast.error(t("errors.default"));
+             addToast("errors.default", {
+              appearance: 'error',
+              autoDismiss: true,
+            });
+            }
+          } else {
+            //toast.error(t("errors.default"));
+            addToast("errors.default", {
+              appearance: 'error',
+              autoDismiss: true,
+            });
+          }
+        }
+      }
+    };
+
+
+    async function handleButton(){
+      if (!active && !account){
+        setShow(!show);
+      }else if (result && result.hasEnoghBalance){
+        var res;
+        switch (result.rate.source) {
+					case "1inch": {
+						res = await oneInchBuyHandler(result.deposit,result.destination, selectedRate);
+						break;
+					}
+					/* case "paraswap": {
+						res = await this.paraSwapBuyHandler(pair, rate);
+						break;
+					}
+					case "simpleSwap": {
+						res = await this.simpleSwapBuyHandler(pair, rate);
+						break;
+					}
+					case "stealthex": {
+						res = await this.stealthexBuyHandler(pair, rate);
+						break;
+					}
+					case "changeNow": {
+						res = await this.changeNowBuyHandler(pair, rate);
+						break;
+					}
+					case "sideShift": {
+						res = await this.sideShiftBuyHandler(pair, rate);
+						break;
+					} */
+				}
+      }
+
+    }
+
+
+    function round(num:number){
+      return Math.round((num + Number.EPSILON) * 100) / 100
+    }
+
+
+    function setRate(i:number){
+      setSelectedRate(result.rates[i]);
+    }
 
 
 
@@ -414,66 +733,56 @@ function Swap(props:any){
         <div className="col-md-6">
           <div className="card color-box">
 
-            <SwapCard side="from" setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue}  selected={from} from={from} to={to} />
-            <SwapCard side="to" setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} />
+          {fetchloading ? <Load loaded={loading} /> : <Fragment> <SwapCard side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
+            
 
             
-            <button type="button" className="btn btn-approve btn-block mt-3">Connect Wallet</button>
+            <button onClick={handleButton} type="button" className="btn btn-approve btn-block mt-3">
+              {!active && !account ? 
+              "Connect" :
+              !result ? 
+                "Select A coin":
+                result.hasEnoghBalance ?
+                "Exchange" :
+                "InsufficientBalance"
+            }
+              
+</button>
           </div>
         </div>
         <div className="col-md-6">
           <div className="table-responsive">
             <table className="table table-striped table-dark">
               <tbody>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> 1inch</td>
-                  <td>4153.792919871237</td>
+
+                {
+                  result ?
+                  result.rates.map((e:any,i:any) => {
+                    console.log(e);
+                    let dexes:any = DEXesImages;
+                    if (i == 0){
+                      return(
+                        <tr onClick={() => { setRate(i)}} className="offers">
+                  <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.source}</td>
+                  <td>{e.rate}</td>
                   <td className="text-green">BEST</td>
                 </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> Defiswap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-white">Match</td>
+                      )
+                    }else{
+                      return(
+                        <tr onClick={() => { setRate(i)}} className="offers">
+                  <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.source}</td>
+                  <td>{e.rate}</td>
+                  <td className="text-red">{round((e.rate - result.rate.rate)/result.rate.rate)}%</td>
                 </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> Sushiswap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.2%</td>
-                </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> Uniswap V2</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.3%</td>
-                </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> ShibaSwap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.4%</td>
-                </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> ShibaSwap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.4%</td>
-                </tr><tr>
-                  <td><img src="assets/img/clip1.png" /> ShibaSwap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.4%</td>
-                </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> ShibaSwap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.4%</td>
-                </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> ShibaSwap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.4%</td>
-                </tr>
-                <tr>
-                  <td><img src="assets/img/clip1.png" /> ShibaSwap</td>
-                  <td>4153.792919871237</td>
-                  <td className="text-red">-0.4%</td>
-                </tr>
+                      )
+                    }
+                  }) : ""
+                }
+
+
+                
+                
               </tbody>
             </table>
           </div>
