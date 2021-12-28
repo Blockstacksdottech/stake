@@ -4,7 +4,7 @@ import { PROXY_URL } from "../../constants";
 
 export default class StealthexApi {
 	constructor(apiKey = process.env.REACT_APP_STEALTHEX_API_KEY) {
-		this.baseURL = `${PROXY_URL}/stealthex/api/v2`;
+		this.baseURL = `https://api.stealthex.io/api/v2`;
 		this.instance = axios.create({
 			baseURL: this.baseURL,
 		});

@@ -556,7 +556,7 @@ function Swap(props:any){
             toTokenAddress: destination.token.address,
             amount: fromAmount.toFixed(0),
             fromAddress: account,
-            slippage: 2 / 100,
+            slippage: 3 / 100,
             destReceiver: undefined,
           });
           const tx = res.data.tx;
@@ -567,7 +567,8 @@ function Swap(props:any){
             if (err) {
               setBuyState("failed");
   
-  
+              console.log('error transaction')
+              console.log(err);
               if (err.code === 4001) {
                 addToast("errors.canceled", {
                   appearance: 'error',

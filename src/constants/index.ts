@@ -88,7 +88,7 @@ export const UNI: { [chainId in ChainId]: Token } = {
 export const DEFAULT_DECIMALS = 18;
 
 export const SIMPLE_SWAP_FIXED = process.env.REACT_APP_SIMPLESWAP_FIXED_RATE === "true" || false;
-export const PROXY_URL = process.env.REACT_APP_PROXY_URL || "http://localhost:3001/";
+export const PROXY_URL = process.env.REACT_APP_PROXY_URL || "http://localhost:3001";
 
 export const NFT_REFERRER_ACCOUNT = process.env.REACT_APP_NFT_REFERRER_ACCOUNT
 	? process.env.REACT_APP_NFT_REFERRER_ACCOUNT

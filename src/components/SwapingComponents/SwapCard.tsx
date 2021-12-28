@@ -2,7 +2,7 @@ import React,{useEffect} from "react";
 import { useWeb3React } from '@web3-react/core';
 import { ETHER, Token } from "@uniswap/sdk";
 import { formatNumber , toFixed } from "../../utils";
-
+import Web3 from "web3";
 import {getCoinBalance} from "../../hooks/loadBalance";
 
 
@@ -50,7 +50,7 @@ function SwapCard(props:any){
         <small> {props.side == "from" ? "From" : "To (estimated)"}</small> 
         {active ? <small className="float-right">Balance: {props.selected ?  (() => {console.log('here 1'); console.log(toFixed(props.selected.max / 10**18)) ; 
         
-      return formatNumber(toFixed(props.selected.max / 10**18)) })()  : 0}</small> : "" }
+      return Web3.utils.fromWei(String(props.selected.max),'ether') })()  : 0}</small> : "" }
       </p>
       <p className="card-title mt-3 select-input-container">
         {props.selected ? <span className="selector" onClick={openModal}>
@@ -59,7 +59,7 @@ function SwapCard(props:any){
            <span className="h1"> Select a Coin</span> <i className="fa fa-chevron-down icon-left" />
         </span>  }
 
-        <input className="float-right Curr-input" disabled={props.side == 'from' ? false : true} value={props.side == "from" ? props.val : props.rate.rate * props.val} onChange={(e:any) => props.handleValue(e,props.side)} inputMode="decimal" title="Token Amount" autoComplete="off" autoCorrect="off" type="text" pattern="^[0-9]*[.,]?[0-9]*$" placeholder="0.0" minLength={1} maxLength={79} spellCheck="false" />
+        <input className="float-right Curr-input" disabled={props.side == 'from' ? false : true} value={props.side == "from" ? props.val : props.rate ?  props.rate.rate * props.val : "0"} onChange={(e:any) => props.handleValue(e,props.side)} inputMode="decimal" title="Token Amount" autoComplete="off" autoCorrect="off" type="text" pattern="^[0-9]*[.,]?[0-9]*$" placeholder="0.0" minLength={1} maxLength={79} spellCheck="false" />
         
        
       </p>
