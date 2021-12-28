@@ -61,7 +61,6 @@ function Swap(props:any){
     };
 
     async function handleSelect(i:number){
-      console.log(tokens[i]);
       let temp = {...tokens[i],value:0,max:0};
       let resp;
       if (side == "from"){
@@ -77,7 +76,6 @@ function Swap(props:any){
       }
         
       }
-      console.log(resp);
 
     }
 
@@ -90,6 +88,10 @@ function Swap(props:any){
               all:36,
               loaded:loading.loaded + count
             });
+            if (id == 'paraswap'){
+              console.log(response.data.priceRoute);
+              response = response.data.priceRoute;
+            }
             resolve({
               id,
               result: response,
@@ -142,6 +144,8 @@ function Swap(props:any){
           }
           case "paraswap": {
             if (apiRates) {
+              console.log("paraswap")
+              console.log(apiRates)
               apiRates.forEach((rate:any) => {
                 if (supportedDEXes["paraswap"].includes(rate.exchange)) {
                   result.push({
@@ -211,6 +215,8 @@ function Swap(props:any){
   
     const getSortedResult = (response:any) => {
       let sortedParts = Object.keys(response).map((key) => [key, getSortedRates(response[key], key)]);
+      console.log('sorted parts here')
+      console.log(sortedParts);
       let transformedRates = transformRates(sortedParts);
       return _.sortBy(transformedRates, (o) => -o.rate);
     };
@@ -251,7 +257,17 @@ function Swap(props:any){
       ))
   
       promises.push(promiseHandler("paraswap", 6, () =>
-        api.paraswap.getRate(deposit.address, destination.address, fromAmount)
+        //api.paraswap.getRate(deposit.address, destination.address, fromAmount)
+        api.paraswapmanual.get("quote",{
+          srcToken : deposit.address,
+          srcDecimals : deposit.decimals,
+          destToken : destination.address,
+          destDecimals :  destination.decimals,
+          amount: String(1 * (10**Number(deposit.decimals))),
+          side : "SELL",
+          network : deposit.chainId,
+          otherExchangePrices : "true"
+        })
       ))
   
       
@@ -325,6 +341,7 @@ function Swap(props:any){
         let promises = getPricesPromises(deposit, destination);
   
         let promisesRes = await Promise.all(promises);
+        console.log("promise res here .....")
         console.log(promisesRes);
   
         const response = transformFetchedData(promisesRes);
@@ -352,7 +369,7 @@ function Swap(props:any){
           showMore: false,
           hasEnough: Number(from.value) <= Number(from.max)
         }
-        console.log(res);
+        //console.log(res);
         setFrom(deposit);
         setTo(destination);
         setResult(res);
@@ -464,7 +481,6 @@ function Swap(props:any){
 
     function handleValue(e:any,side:string){
       let v = e.target.value;
-      console.log(v);
       if (side == "from"){
         let temp = {...from};
         temp.value = Number(v);
@@ -759,7 +775,7 @@ function Swap(props:any){
                 {
                   result ?
                   result.rates.map((e:any,i:any) => {
-                    console.log(e);
+                    
                     let dexes:any = DEXesImages;
                     if (i == 0){
                       return(
