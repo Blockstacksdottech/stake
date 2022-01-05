@@ -78,6 +78,14 @@ export async function getPrice(){
 
 }
 
+export async function getPriceCoin(idd:any){
+    let vs = "usd";
+    let resp:any = await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+idd+'&vs_currencies='+vs);
+    let data:any = await resp.json();
+    return data[idd].usd;
+
+}
+
 
 export function formatNumber(num:any)
 {

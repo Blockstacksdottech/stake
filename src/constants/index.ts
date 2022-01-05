@@ -73,7 +73,9 @@ export const DEXesImages = {
 	sideShift: "SIDESHIFT.png"
 };
 
-
+export const networks_dict = {
+	1 : 'eth'
+}
 
 
 const UNI_ADDRESS = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";

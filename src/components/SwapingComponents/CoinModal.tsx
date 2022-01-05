@@ -10,7 +10,6 @@ function CoinModal({ show, setShow, currencies, handleCurr }: any) {
     function filter(e:any){
         let t = e.target;
         let v = t.value.toLowerCase();
-        console.log(v.length)
         if (v.length == 0){
             setFiltered(currencies);
         }else{
@@ -21,11 +20,9 @@ function CoinModal({ show, setShow, currencies, handleCurr }: any) {
                 }
 
             }
-            console.log(res);
             setFiltered(res);
         }
         
-        console.log(t.value);
     }
 
 
@@ -37,7 +34,8 @@ function CoinModal({ show, setShow, currencies, handleCurr }: any) {
           Select Coin
         </h4>
         <div className='coin-search'>
-            <input onChange={filter} placeholder="Coin Symbol" />
+          
+            <input onChange={filter} placeholder="Search by Name" className="form-control form-control-lg mt-4 search-coin" />
         </div>
           </div>
         

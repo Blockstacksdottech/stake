@@ -20,9 +20,14 @@ function Reward(props:any){
     
 
     async function getTokenSymbol(){
+      try{
         let c = loadContract(library,bep20,token);
         let resp = await c.methods.symbol().call();
         setSymbol(resp);
+      }catch(e:any){
+        console.log(e);
+      }
+        
     }
 
     async function claimRewards(){

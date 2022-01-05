@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import Sidebar from './GeneralComponents/Sidebar';
 import ModalConnect from './GeneralComponents/ModalConnect';
 import TopNav from './GeneralComponents/TopNav';
-import _ from "lodash";
+import _, { add } from "lodash";
 import { loadContract } from '../utils';
 import { BigNumber } from "@0x/utils";
 
@@ -13,8 +13,9 @@ import { walletTokens as toks } from "../constants/spot-config/mainnet/config.js
 
 import {
 	BTC,CHANGE_NOW_FLOW,SIDE_SHIFT_TYPE,supportedDEXes,SIMPLE_SWAP_FIXED,DEXesImages,
-  ZERO
+  ZERO,PARASWAP_REFERRER_ACCOUNT,networks_dict
 } from "../constants";
+import { ChainId } from "@uniswap/sdk";
 
 import InstantSwapApi from "../http/instantSwap";
 
@@ -24,6 +25,7 @@ import {  useToasts } from 'react-toast-notifications';
 import Load from './GeneralComponents/Load';
 import { selectClasses } from '@mui/material';
 import { ERC20_ABI } from '../constants/abis/erc20';
+import ConfModal from './SwapingComponents/ConfModal';
 
 function Swap(props:any){
 
@@ -44,9 +46,14 @@ function Swap(props:any){
     const [tokens , setTokens] = useState([...toks])
     const [max,setMax]  = useState(0);
     const [priceInterval,setPriceInterval]:any = useState(null);
-    const [selectedRate,setSelectedRate] = useState(NaN);
+    const [selectedRate,setSelectedRate]:any = useState(null);
     const [BuyState,setBuyState] = useState("");
-
+    const [swapData,setSwapData] = useState({
+      show : false,
+      platform : "",
+      id : "",
+      address : ""
+    })
 
     const onChangeBalance = (balance:any,side:any) => {
       if (side == "from" && from){
@@ -59,6 +66,27 @@ function Swap(props:any){
         setTo(temp);
       }
     };
+
+    async function switchHandler(){
+      let temp;
+      let temp2;
+      if (from){
+        temp = {...from};
+      }else{
+        temp = null;
+      }
+      if (to){
+        temp2 = {...to};
+      } else {
+        temp2 = null;
+      }
+      setFrom(temp2);
+      setTo(temp);
+      if (from && to && from.symbol && to.symbol){
+        let resp = await fetchPrices(temp2,temp);
+      }
+      
+    }
 
     async function handleSelect(i:number){
       let temp = {...tokens[i],value:0,max:0};
@@ -76,6 +104,7 @@ function Swap(props:any){
       }
         
       }
+      setCurrShow(false);
 
     }
 
@@ -89,7 +118,6 @@ function Swap(props:any){
               loaded:loading.loaded + count
             });
             if (id == 'paraswap'){
-              console.log(response.data.priceRoute);
               response = response.data.priceRoute;
             }
             resolve({
@@ -144,8 +172,6 @@ function Swap(props:any){
           }
           case "paraswap": {
             if (apiRates) {
-              console.log("paraswap")
-              console.log(apiRates)
               apiRates.forEach((rate:any) => {
                 if (supportedDEXes["paraswap"].includes(rate.exchange)) {
                   result.push({
@@ -215,8 +241,6 @@ function Swap(props:any){
   
     const getSortedResult = (response:any) => {
       let sortedParts = Object.keys(response).map((key) => [key, getSortedRates(response[key], key)]);
-      console.log('sorted parts here')
-      console.log(sortedParts);
       let transformedRates = transformRates(sortedParts);
       return _.sortBy(transformedRates, (o) => -o.rate);
     };
@@ -341,8 +365,6 @@ function Swap(props:any){
         let promises = getPricesPromises(deposit, destination);
   
         let promisesRes = await Promise.all(promises);
-        console.log("promise res here .....")
-        console.log(promisesRes);
   
         const response = transformFetchedData(promisesRes);
   
@@ -361,6 +383,10 @@ function Swap(props:any){
             autoDismiss: true,
           })
         }
+        console.log("from here")
+        console.log(from.max);
+        console.log(from.value);
+        
         let res:any = {
           destination,
           deposit,
@@ -389,6 +415,7 @@ function Swap(props:any){
           pair,
           showMore: false,
         }); */
+        console.log('else one');
 
         let res = {
           destination,
@@ -445,7 +472,7 @@ function Swap(props:any){
             rates: result,
             rate: result.length > 0 ? newRate : undefined,
             priceLoading: false,
-            hasEnoughBalance:
+            hasEnough:
             Number(from.value) <= Number(from.max),
           }
 
@@ -479,11 +506,18 @@ function Swap(props:any){
       updatePriceIntervally(deposit, destination);
     }
 
-    function handleValue(e:any,side:string){
-      let v = e.target.value;
+    function handleValue(v:any,side:string){
+      
       if (side == "from"){
         let temp = {...from};
-        temp.value = Number(v);
+        /* console.log(Number(v));
+        if (Number(v) != NaN){
+          temp.value = Number(v);
+        }else{
+          temp.value = 0;
+        } */
+        temp.value = v;
+        
         setFrom(temp);
       }
     }
@@ -502,6 +536,7 @@ function Swap(props:any){
 
     const oneInchBuyHandler = async (deposit:any,destination:any, rate:any) => {
       try {
+        alert("1inch")
         let canExchange = false;
         let pending = false;
         setBuyState("initializing");
@@ -510,9 +545,9 @@ function Swap(props:any){
         const spenderRes = await api.oneInch.get("spender");
         const spender = spenderRes.data.address;
   
-        let fromAmount = new BigNumber(deposit.value).times(10 ** deposit.token.decimals);
+        let fromAmount = new BigNumber(deposit.value).times(10 ** deposit.decimals);
   
-        if (deposit.token.symbol.toUpperCase() !== "ETH") {
+        if (deposit.symbol.toUpperCase() !== "ETH") {
           setBuyState("allowance");
   
           let contract = loadContract(
@@ -521,14 +556,17 @@ function Swap(props:any){
             deposit.address
           );
   
-          allowance = await contract.methods.allowance(account, spender);
+          allowance = await contract.methods.allowance(account, spender).call();
+          console.log("allowance")
+          console.log(allowance);
           allowance = new BigNumber(allowance);
   
           if (fromAmount.isGreaterThan(allowance)) {
             setBuyState("approving");
-  
+            console.log('approving')
             const maxAllowance = new BigNumber(2).pow(256).minus(1);
-            contract.methods.approve(spender, maxAllowance.toFixed(0)).on('receipt',(receipt:any) =>{
+            await contract.methods.approve(spender, maxAllowance.toFixed(0)).send({from:account}).on('receipt',(receipt:any) =>{
+              alert('approved');
               pending = false;
               canExchange = true;
             }).on('error',(err:any) => {
@@ -546,7 +584,7 @@ function Swap(props:any){
         }
   
         if (canExchange) {
-          if (deposit.token.symbol.toUpperCase() !== "ETH" && pending) {
+          if (deposit.symbol.toUpperCase() !== "ETH" && pending) {
             let contract = loadContract(
               library,
             ERC20_ABI,
@@ -568,15 +606,17 @@ function Swap(props:any){
           setBuyState("create_tx");
   
           const res = await api.oneInch.get("swap", {
-            fromTokenAddress: deposit.token.address,
-            toTokenAddress: destination.token.address,
+            fromTokenAddress: deposit.address,
+            toTokenAddress: destination.address,
             amount: fromAmount.toFixed(0),
             fromAddress: account,
             slippage: 3 / 100,
-            destReceiver: undefined,
+            destReceiver: account,
           });
-          const tx = res.data.tx;
-  
+          let tx = res.data.tx;
+          
+          console.log('1inch tx here .....')
+          console.log(tx);
           setBuyState("send_tx");
   
           library.eth.sendTransaction(tx, async (err:any, transactionHash:any) => {
@@ -597,52 +637,31 @@ function Swap(props:any){
                   autoDismiss: true,
                 });
               }
-              //isExchangeInProgress = false;
               return false;
             }
   
             setBuyState("submitted");
-  
-            //this.setDefaultBuyState();
-            //this.isExchangeInProgress = false;
-            //toast.success(t("instantSwap.orderSubmitted"));
             addToast("instantSwap.orderSubmitted", {
               appearance: 'success',
               autoDismiss: true,
             });
-            /* if (typeof transactionHash === "string") {
-              this.props.addTransaction({
-                chainId: ChainId.MAINNET,
-                addedTime: Date.now(),
-                hash: transactionHash,
-                from: this.props.web3.account,
-              });
-            } */
           });
         } else {
-          //toast.error(t("errors.approvalPending"));
           addToast("errors.approvalPending", {
             appearance: 'error',
             autoDismiss: true,
           });
         }
-        //this.isExchangeInProgress = false;
       } catch (e:any) {
         setBuyState("failed");
-  
-        //this.setDefaultBuyState();
-  
-        //this.isExchangeInProgress = false;
-  
+        console.log(e);
         if (e.hasOwnProperty("code")) {
           if (e.code === 4001) {
-           //toast.error(t("errors.canceled"));
             addToast("errors.canceled", {
               appearance: 'error',
               autoDismiss: true,
             });
           } else {
-           // toast.error(t("errors.default"));
             addToast("errors.default", {
               appearance: 'error',
               autoDismiss: true,
@@ -653,28 +672,25 @@ function Swap(props:any){
             if (e.response.status === 500) {
               if (e.response.data.hasOwnProperty("errors")) {
                 e.response.data.errors.map((err:any) => {
-                  //toast.error(err.msg);
                   addToast(err.msg, {
                     appearance: 'error',
                     autoDismiss: true,
                   });
                 });
               } else {
-                //toast.error(t("errors.unavailablePair"));
                 addToast("errors.unavailablePair", {
                   appearance: 'error',
                   autoDismiss: true,
                 });
               }
             } else {
-             // toast.error(t("errors.default"));
+
              addToast("errors.default", {
               appearance: 'error',
               autoDismiss: true,
             });
             }
           } else {
-            //toast.error(t("errors.default"));
             addToast("errors.default", {
               appearance: 'error',
               autoDismiss: true,
@@ -684,38 +700,504 @@ function Swap(props:any){
       }
     };
 
+    const paraSwapBuyHandler = async (deposit:any,destination:any, rate:any) => {
+      alert("paraswap")
+      const recipient = account;
+      try {
+        setBuyState("initializing");
+        let pending = false;
+        let canExchange = false;
+        const paraswap = api.paraswap.setWeb3Provider(library);
+  
+        let fromAmount = new BigNumber(deposit.value).times(10 ** deposit.decimals);
+        let toAmount = new BigNumber(selectedRate.rate * deposit.value).times(10 ** destination.decimals);
+  
+        setBuyState("allowance");
+        const allowanceRes = await paraswap.getAllowance(account, deposit.address);
+        let allowance = new BigNumber(allowanceRes.allowance);
+        if (deposit.symbol !== "ETH" && fromAmount.isGreaterThan(allowance)) {
+          const maxAllowance = new BigNumber(2).pow(256).minus(1);
+          setBuyState("approving");
+          try {
+            const approve = await paraswap.approveToken(
+              maxAllowance.toFixed(),
+              account,
+              deposit.address
+            );
+            console.log(approve);
+            canExchange = true;
+            pending = true;
+            
+          } catch (e) {
+            canExchange = false;
+          }
+        } else {
+          canExchange = true;
+        }
+  
+        if (canExchange) {
+          if (pending) {
+            const allowanceRes = await paraswap.getAllowance(account, deposit.address);
+            let allowance = new BigNumber(allowanceRes.allowance);
+            if (deposit.symbol !== "ETH" && fromAmount.isGreaterThan(allowance)) {
+              addToast("approvalPending", {
+                appearance: 'error',
+                autoDismiss: true,
+              });
+              
+              return false;
+            }
+          }
+  
+          setBuyState("create_tx");
+          console.log("from amount here")
+          console.log(fromAmount.toFixed(0))
+          const api_resp = await api.paraswapmanual.get("quote",{
+            srcToken : deposit.address,
+            srcDecimals : deposit.decimals,
+            destToken : destination.address,
+            destDecimals :  destination.decimals,
+            amount: fromAmount.toFixed(0),
+            side : "SELL",
+            network : deposit.chainId,
+            otherExchangePrices : "true"
+          })
+          const api_resp_2 = await api.paraswapmanual.get("quote",{
+            srcToken : deposit.address,
+            srcDecimals : deposit.decimals,
+            destToken : destination.address,
+            destDecimals :  destination.decimals,
+            amount: fromAmount.toFixed(0),
+            side : "SELL",
+            network : deposit.chainId,
+            //otherExchangePrices : "true"
+          })
+          /* const rates = api_resp.data.priceRoute;
+          
+          const selectedRoute = rates.others.find((item:any) => item.exchange === rate.platform);
+          console.log(selectedRoute);
+          const txRoute = [
+            {
+              ...rates.bestRoute[0],
+              ...selectedRoute,
+            },
+          ];
+          let payload = api_resp.data;
+
+
+          rates.bestRoute = txRoute;
+          payload.priceRoute.bestRoute = txRoute;
+          delete payload.priceRoute.others;
+          delete api_resp.data.priceRoute.others;
+          console.log(api_resp);
+          console.log(payload);
+          let temp = api_resp_2.data.priceRoute;
+          temp.bestRoute = selectedRoute; */
+          const txParams = await paraswap.buildTx(
+            deposit.address,
+            destination.address,
+            fromAmount.toFixed(0),
+            toAmount.toFixed(0),
+            api_resp_2.data.priceRoute,
+            account,
+            PARASWAP_REFERRER_ACCOUNT,
+            recipient !== null ? recipient : undefined
+          );
+          setBuyState("send_tx");
+  
+          if (txParams?.message) {
+            addToast(txParams.message, {
+              appearance: 'error',
+              autoDismiss: true,
+            });
+            
+  
+            setBuyState("failed");
+
+  
+            return false;
+          }
+  
+          library.eth.sendTransaction(txParams, async (err:any, transactionHash:any) => {
+            if (err) {
+              setBuyState("failed");
+  
+
+  
+              if (err.code === 4001) {
+                
+                addToast("errors.canceled", {
+                  appearance: 'error',
+                  autoDismiss: true,
+                });
+                
+              } else {
+                addToast("errors.default", {
+                  appearance: 'error',
+                  autoDismiss: true,
+                });
+              }
+  
+              return false;
+            }
+            setBuyState("submitted");
+            addToast("Swap submited", {
+              appearance: 'success',
+              autoDismiss: true,
+            });
+            
+            
+          });
+        } else {
+          setBuyState("pending");
+  
+          
+        }
+      } catch (e:any) {
+        setBuyState("failed");
+        console.log('failed');
+        console.log(e);
+  
+        //setDefaultBuyState();
+  
+        if (e.hasOwnProperty("code")) {
+          if (e.code === 4001) {
+            addToast("errors.canceled", {
+              appearance: 'error',
+              autoDismiss: true,
+            });
+            
+          } else {
+            addToast("errors.default", {
+              appearance: 'error',
+              autoDismiss: true,
+            });
+          }
+        } else {
+          addToast("errors.default", {
+            appearance: 'error',
+            autoDismiss: true,
+          });
+        }
+        //isExchangeInProgress = false;
+      }
+    };
+  
+    
+    const simpleSwapBuyHandler = async (deposit:any,destination:any, rate:any) => {
+      try {
+        setBuyState("initializing");
+        
+  
+        setBuyState("validation");
+        if (deposit.value < rate.min || (rate.max > 0 && deposit.value >= rate.max)) {
+          addToast( deposit.value < rate.min
+            ? `The minimum value for this transaction is ${rate.min}`
+            : `The maximum value for this transaction is ${rate.max}`, {
+              appearance: 'error',
+              autoDismiss : true
+            } ) 
+          
+          setBuyState("failed");
+          //setDefaultBuyState();
+          return;
+        }
+  
+        setBuyState("create_tx");
+        const res = await api.simpleSwap.set("exchange", {
+          data: {
+            fixed: SIMPLE_SWAP_FIXED,
+            currency_from: deposit.symbol.toLowerCase(),
+            currency_to: destination.symbol.toLowerCase(),
+            amount: deposit.value,
+            address_to: account,
+          },
+        });
+  
+        if (res) {
+          if (res.code && res.code !== 200) {
+            addToast(res.message,{
+              appearance:'error',
+              autoDismiss: true
+            })
+            //toast.error(res.message);
+          } else {
+            addToast("Your Order submitted successfully",{
+              appearance:'success',
+              autoDismiss : true
+            });
+
+            //toast.success("Your order submitted successfully!");
+            setBuyState("submitted");
+            console.log("here simpleswap response")
+            console.log(res);
+            /* setState({
+              showQrModal: true,
+              orderType: "simpleSwap",
+              order: res,
+            }); */
+
+            setSwapData({
+              show: true,
+              platform: "SimpleSwap",
+              id: res.id,
+              address : res.address_from
+            })
+            //setDefaultBuyState();
+          }
+        }
+      } catch (e) {
+        console.log(e);
+        //toast.error("An Error was occurred");
+        addToast("An error occured in simpeSwap");
+        setBuyState("failed");
+        //setDefaultBuyState();
+      }
+    };
+
+
+
+     const changeNowBuyHandler = async (deposit:any,destination:any, rate:any) => {
+     
+      try {
+        setBuyState("initializing");
+        
+  
+        setBuyState("validation");
+        console.log(deposit.value, rate);
+        if (deposit.value < rate.min || (rate.max > 0 && deposit.value >= rate.max)) {
+          addToast( deposit.value < rate.min
+            ? `The minimum value for this transaction is ${rate.min}`
+            : `The maximum value for this transaction is ${rate.max}`, {
+              appearance: 'error',
+              autoDismiss : true
+            } ) 
+
+          
+          setBuyState("failed");
+         
+          return;
+        }
+  
+        const validation = await api.changeNow.get('address_validation', {
+          params: {
+            currency: destination.symbol.toLowerCase(),
+            address: account,
+          }
+        })
+  
+        if(!validation?.data?.result) {
+          addToast(validation?.data?.message,{
+            appearance : "error",
+            autoDismiss : true
+          })
+          
+          return false;
+        }
+  
+        setBuyState("create_tx");
+        let n_d:any = networks_dict;
+        const res = await api.changeNow.createTransaction({
+          body: {
+            "fromCurrency": deposit.symbol.toLowerCase(),
+            "toCurrency": destination.symbol.toLowerCase(),
+            "fromAmount": deposit.value,
+            "address": account,
+            "fromNetwork" : n_d[deposit.chainId],
+            "toNetwork" : n_d[destination.chainId],
+            "flow": CHANGE_NOW_FLOW,
+            "type": "direct",
+            "rateId": CHANGE_NOW_FLOW === "fixed-rate" ? rate.rateId : ""
+          }
+        })
+  
+        if (res) {
+          if(res?.message) {
+            addToast(res.message,{
+              appearance:'error',
+              autoDismiss: true
+            })
+            setBuyState("failed");
+            
+            return false;
+          }
+          addToast("Your Order submitted successfully",{
+            appearance:'success',
+            autoDismiss : true
+          });
+          setBuyState("submitted");
+          console.log("Change Now response");
+          console.log(res);
+          setSwapData({
+            show: true,
+            platform: "ChangeNow",
+            id: res.id,
+            address : res.payinAddress
+          })
+         /*  setState({
+            showQrModal: true,
+            orderType: "changeNow",
+            order: res,
+          }); */
+          
+        } else {
+          addToast("Failed Transaction",{
+            appearance: "error",
+            autoDismiss : true
+          })
+         
+        }
+      } catch (e:any) {
+        console.log(e);
+        if(e?.message) {
+          addToast(e?.message,{
+            appearance: "error",
+            autoDismiss : true
+          })
+        } else if(e?.response?.data?.message) {
+          addToast(e?.response?.data?.message,{
+            appearance: "error",
+            autoDismiss : true
+          })
+
+        } else {
+          addToast("Default Error",{
+            appearance: "error",
+            autoDismiss : true
+          })
+        }
+        setBuyState("failed");
+      }
+    }
+  
+    const sideShiftBuyHandler = async (deposit:any,destination:any, rate:any) => {
+      try {
+        setBuyState("initializing");
+      
+  
+        setBuyState("validation");
+        console.log(deposit.value, rate);
+        if (deposit.value < rate.min || (rate.max > 0 && deposit.value >= rate.max)) {
+          addToast( deposit.value < rate.min
+            ? `The minimum value for this transaction is ${rate.min}`
+            : `The maximum value for this transaction is ${rate.max}`, {
+              appearance: 'error',
+              autoDismiss : true
+            } ) 
+          setBuyState("failed");
+          return false;
+        }
+  
+        const validation = await api.sideShift.get('permissions');
+        if(!validation?.createOrder || !validation?.createQuote) {
+          addToast("sideShift Validation Error",{
+            appearance : "error",
+            autoDismiss : true
+          })
+          return false;
+        }
+  
+        const order = await api.sideShift.post("order", {
+          body: {
+            "depositMethod": deposit.symbol.toLowerCase(),
+            "settleMethod": destination.symbol.toLowerCase(),
+            "settleAddress": account,
+            "depositAmount": deposit.value,
+          }
+        })
+        if(order) {
+          if(order.hasOwnProperty("error")) {
+            addToast(order?.error?.message,{
+              appearance : "error",
+              autoDismiss : true
+            })
+            setBuyState("failed");
+            return false;
+          } else {
+            addToast("Your Order submitted successfully",{
+              appearance:'success',
+              autoDismiss : true
+            });
+            setBuyState("submitted");
+            console.log("sideShift response");
+            console.log(order);
+            setSwapData({
+              show: true,
+              platform: "SideShift",
+              id: order.id,
+              address : order.depositAddress.address
+            })
+          }
+        }
+      } catch (e:any) {
+        console.log(e);
+        if(e?.message) {
+          addToast(e?.message,{
+            appearance: "error",
+            autoDismiss : true
+          })
+        } else if(e?.response?.data?.message) {
+          addToast(e?.response?.data?.message,{
+            appearance: "error",
+            autoDismiss : true
+          })
+
+        } else {
+          addToast("Default Error",{
+            appearance: "error",
+            autoDismiss : true
+          })
+        }
+        setBuyState("failed");
+      }
+    } 
+
+
+
 
     async function handleButton(){
       if (!active && !account){
         setShow(!show);
-      }else if (result && result.hasEnoghBalance){
+
+        //&& result.hasEnough
+      }else if (result ){
+
         var res;
-        switch (result.rate.source) {
+        switch (selectedRate.source) {
 					case "1inch": {
-						res = await oneInchBuyHandler(result.deposit,result.destination, selectedRate);
+						res = await oneInchBuyHandler(from,to, selectedRate);
 						break;
 					}
-					/* case "paraswap": {
-						res = await this.paraSwapBuyHandler(pair, rate);
+					case "paraswap": {
+						res = await paraSwapBuyHandler(from,to, selectedRate);
 						break;
 					}
+
+
+           
 					case "simpleSwap": {
-						res = await this.simpleSwapBuyHandler(pair, rate);
+						res = await simpleSwapBuyHandler(from,to, selectedRate);
 						break;
 					}
+          case "changeNow": {
+						res = await changeNowBuyHandler(from,to, selectedRate);
+						break;
+					}
+
+          case "sideShift": {
+						res = await sideShiftBuyHandler(from,to, selectedRate);
+						break;
+					} 
+          /*
 					case "stealthex": {
 						res = await this.stealthexBuyHandler(pair, rate);
 						break;
 					}
-					case "changeNow": {
-						res = await this.changeNowBuyHandler(pair, rate);
-						break;
-					}
-					case "sideShift": {
-						res = await this.sideShiftBuyHandler(pair, rate);
-						break;
-					} */
+					
+					*/
 				}
+
+        console.log(res);
       }
 
     }
@@ -749,8 +1231,18 @@ function Swap(props:any){
       <div className="row mt-4">
         <div className="col-md-6">
           <div className="card color-box">
+          <p className="card-title mt-2 mb-3">
+  <span className="float-right">
+    <a><img src="/assets/img/loading.png" /></a>
+    <a onClick={async () => {if (from && to && from.symbol && to.symbol){
+        let resp = await fetchPrices(from,to);
+      }}}><img src="/assets/img/refresh.png" /></a>
+    <a><img src="/assets/img/settings.png" className="pl-4" /></a>
+  </span>
+</p>
 
-          {fetchloading ? <Load loaded={loading} /> : <Fragment> <SwapCard side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
+
+          {fetchloading ? <Load loaded={loading} /> : <Fragment> <SwapCard switchHandler={switchHandler} side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
             
 
             
@@ -759,7 +1251,7 @@ function Swap(props:any){
               "Connect" :
               !result ? 
                 "Select A coin":
-                result.hasEnoghBalance ?
+                result.hasEnough ?
                 "Exchange" :
                 "InsufficientBalance"
             }
@@ -779,7 +1271,7 @@ function Swap(props:any){
                     let dexes:any = DEXesImages;
                     if (i == 0){
                       return(
-                        <tr onClick={() => { setRate(i)}} className="offers">
+                        <tr key={i} onClick={() => { setRate(i)}} className="offers">
                   <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.source}</td>
                   <td>{e.rate}</td>
                   <td className="text-green">BEST</td>
@@ -787,7 +1279,7 @@ function Swap(props:any){
                       )
                     }else{
                       return(
-                        <tr onClick={() => { setRate(i)}} className="offers">
+                        <tr key={i} onClick={() => { setRate(i)}} className="offers">
                   <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.source}</td>
                   <td>{e.rate}</td>
                   <td className="text-red">{round((e.rate - result.rate.rate)/result.rate.rate)}%</td>
@@ -807,6 +1299,7 @@ function Swap(props:any){
       </div>
     </div>
     <CoinModal show={currShow} setShow={setCurrShow} handleCurr={handleSelect} currencies={tokens}  />
+    <ConfModal show = {swapData.show} closeHandler={setSwapData} data={swapData} platform= {swapData.platform} id={swapData.id} address={swapData.address} />
     <div className="mt-5">
       <footer>
         <p className="text-center text-white">
