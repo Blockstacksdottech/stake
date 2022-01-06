@@ -149,6 +149,9 @@
     transform: rotate(360deg);
   }
 }
+.collapse-table th,.collapse-table td{
+  color:#fff !important;
+}
 
 
 .btn-black {
@@ -283,7 +286,7 @@
   color:rgb(223, 223, 223);
 } */
 
-.css-177gid-MuiTableCell-root {
+/* .css-177gid-MuiTableCell-root {
   color: #fff !important;
 }
 
@@ -293,7 +296,10 @@
 
 .css-1pe4mpk-MuiButtonBase-root-MuiIconButton-root {
   color: #fff !important;
-}
+} */
+
+
+
 
 .farm-icon{
   width:42px;
@@ -480,6 +486,10 @@ footer {
     scroll-behavior: smooth;
   }
 }
+
+
+
+
 
 body {
   margin: 0;
@@ -11801,7 +11811,7 @@ textarea.form-control-lg {
   }
 }
 
-.css-1azl6jz-MuiTableCell-root {
+/* .css-1azl6jz-MuiTableCell-root {
   color: #fff !important;
 }
 
@@ -11811,7 +11821,7 @@ textarea.form-control-lg {
 
 .css-1ex1afd-MuiTableCell-root {
   color: #fff !important;
-}
+} */
 
 
 #wrapper {

@@ -9,6 +9,7 @@ import CollapsingRow from '../GeneralComponents/CollapsingRow';
 import Paper from '@mui/material/Paper';
 
 
+
 function FarmsTable(props:any){
 
     const {rows} = props;
@@ -16,7 +17,7 @@ function FarmsTable(props:any){
 
 
     const html = (<TableContainer component={Paper}>
-        <Table className="table-striped table-dark" aria-label="collapsible table">
+        <Table className="table-striped table-dark collapse-table" aria-label="collapsible table">
           <TableHead>
             <TableRow>
               
