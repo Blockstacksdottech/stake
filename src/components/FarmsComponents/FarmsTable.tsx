@@ -26,7 +26,6 @@ function FarmsTable(props:any){
               <TableCell align="right">Earned</TableCell>
               <TableCell align="right">APR</TableCell>
               <TableCell align="right">Liquidity</TableCell>
-              <TableCell align="right"></TableCell>
               <TableCell />
             </TableRow>
           </TableHead>

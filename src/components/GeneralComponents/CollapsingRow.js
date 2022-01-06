@@ -33,7 +33,7 @@ function CollapsingRow(props) {
           <TableCell component="th" scope="row">
             {row.pair}
           </TableCell>
-          <TableCell align="right"><img src="assets/img/clip1.png" /></TableCell>
+          <TableCell align="right"><img className='farm-icon' src={row.icon} /></TableCell>
           <TableCell align="right">{row.farm}</TableCell>
           <TableCell align="right">{row.earned}</TableCell>
           <TableCell align="right">{row.apr}</TableCell>

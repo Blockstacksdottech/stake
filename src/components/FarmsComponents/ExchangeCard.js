@@ -158,12 +158,12 @@ function ExchangeCard(props){
     <div className="card box-green">
       <form>
         <div className="card-body">
+        <p className="card-title"><label className="float-right">Wallet Balance: {formatNumber(toFixed(balance / 10**18))}</label></p>
           <div className="form-group mt-3">
             <input id="balance" max={100} defaultValue={0} onChange={handleInpChange} type="range" className="custom-range"  />
           </div>
           <div className="form-group mt-3">
-            <label className="float-left text-white">Wallet balance: {formatNumber(toFixed(balance / 10**18))}</label>
-            <label className="float-left text-white">Stake %: {StakedPerc}%</label>
+            <label className="float-left text-white">Stake(%): {StakedPerc}%</label>
             <label className="float-right badge badge-danger">MAX</label>
           </div>
         </div>
@@ -177,16 +177,16 @@ function ExchangeCard(props){
       </form>
     </div>
   </div>
-  <div className="col-md-5 mx-auto">
+  <div className="col-md-4 mx-auto">
     <div className="card box-green">
       <form>
         <div className="card-body">
+        <p className="card-title"><label className="float-right">Your stake: {formatNumber(toFixed(Staked / 10**18))}</label></p>
           <div className="form-group mt-3">
             <input id="staked" max={100} defaultValue={0} onChange={handleInpChange} type="range" className="custom-range"  />
           </div>
           <div className="form-group mt-3">
-            <label className="float-left text-white">Your stake: {formatNumber(toFixed(Staked / 10**18))}</label>
-            <label className="float-left text-white">Withdraw %: {WithdrawPerc}%</label>
+            <label className="float-left text-white">Withdraw(%): {WithdrawPerc}%</label>
             <label className="float-right badge badge-danger">MAX</label>
           </div>
         </div>
@@ -200,15 +200,15 @@ function ExchangeCard(props){
       </form>
     </div>
   </div>
-  <div className="col-md-5 mx-auto">
+  <div className="col-md-4 mx-auto">
     <div className="card box-green">
       <form>
         <div className="card-body">
           <div className="form-group mt-3">
-            <label className="float-left text-white">Your Reward: ${formatReward(Reward)}</label>
+            <h4 className="">Your Reward <br></br> ${formatReward(Reward)}</h4>
           </div>
         </div>
-        <div className="card-footer mt-4">
+        <div className="card-footer">
           <div className="row">
             <div className="col-md-12">
               <button onClick={Claim} type="button" className="btn btn-black btn-block">Claim</button>

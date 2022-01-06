@@ -32,25 +32,7 @@ function Farm(props:any){
   const {account , active ,chainId, library} = useWeb3React();
   const {addToast} = useToasts();
 
-  async function handleWrite(c:any,name:string,...args:any){
   
-    c.methods[name](...args).send({from:account}).on('receipt',(receipt:any) => {
-            addToast("Transaction Confirmed", {
-                appearance: 'success',
-                autoDismiss: true,
-              })
-        }).on('transactionHash',(hash:any) => {
-            addToast("Transaction Created : "+hash, {
-                appearance: 'success',
-                autoDismiss: true,
-              })
-        }).on('error',(err:any)=>{
-            addToast('Transaction Failed', {
-                appearance: 'error',
-                autoDismiss: true,
-              })
-        }).then((resp:any) => console.log(resp))
-}
 
   async function FormatOneInchFarms(data:any){
       let cont = []
@@ -94,7 +76,6 @@ function Farm(props:any){
       }
       let temp = [...farms,...cont];
 
-        console.log(temp);
         setFarms(temp);
       addToast("Loaded 1Inch Farms",{
         appearance:"success",

@@ -4,7 +4,7 @@
 			"address": "0x6c3f90f043a72fa612cbac8115ee7e52bde6e490",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://s2.coinmarketcap.com/static/img/coins/64x64/8249.png",
+			"logoURI": "/assets/icons/crv.png",
 			"name": "3Pool Curve",
 			"symbol": "3PoolCurve"
 		},
@@ -12,7 +12,7 @@
 			"address": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://s2.coinmarketcap.com/static/img/coins/64x64/7278.png",
+			"logoURI": "/assets/icons/aave.jpg",
 			"name": "Aave",
 			"symbol": "AAVE"
 		},
@@ -20,7 +20,7 @@
 			"address": "0x8ab7404063ec4dbcfd4598215992dc3f8ec853d7",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://s2.coinmarketcap.com/static/img/coins/64x64/4134.png",
+			"logoURI": "/assets/icons/akro.png",
 			"name": "Akropolis",
 			"symbol": "AKRO"
 		},
@@ -44,7 +44,7 @@
 			"address": "0xcd62b1c403fa761baadfc74c525ce2b51780b184",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/ANJ-icon.png",
+			"logoURI": "/assets/icons/anj.png",
 			"name": "Aragon Court",
 			"symbol": "ANJ"
 		},
@@ -68,7 +68,7 @@
 			"address": "0x34612903db071e888a4dadcaa416d3ee263a87b9",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/ARTE-icon.png",
+			"logoURI": "/assets/icons/arte.png",
 			"name": "ethArt",
 			"symbol": "ARTE"
 		},
@@ -116,7 +116,7 @@
 			"address": "0x68a118ef45063051eac49c7e647ce5ace48a68a5",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/$BASED-icon.png",
+			"logoURI": "/assets/icons/based.png",
 			"name": "Based Money",
 			"symbol": "BASED"
 		},
@@ -140,7 +140,7 @@
 			"address": "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/BNT-icon.png",
+			"logoURI": "bnt.png",
 			"name": "Bancor Network Token",
 			"symbol": "BNT"
 		},
@@ -164,7 +164,7 @@
 			"address": "0x5beabaebb3146685dd74176f68a0721f91297d37",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/BOT-icon.png",
+			"logoURI": "/assets/icons/bot.png",
 			"name": "Bounce Token",
 			"symbol": "BOT"
 		},
@@ -172,7 +172,7 @@
 			"address": "0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/BTC++-icon.png",
+			"logoURI": "/assets/icons/btc++.png",
 			"name": "PieDAO BTC++",
 			"symbol": "BTC++"
 		},
@@ -188,7 +188,7 @@
 			"address": "0x6e36556b3ee5aa28def2a8ec3dae30ec2b208739",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/BUILD-icon.png",
+			"logoURI": "/assets/icons/build.png",
 			"name": "BUILD Finance",
 			"symbol": "BUILD"
 		},
@@ -204,7 +204,7 @@
 			"address": "0x3b3ac5386837dc563660fb6a0937dfaa5924333b",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/BUSD Curve-icon.png",
+			"logoURI": "/assets/icons/crv.png",
 			"name": "LP-bCurve",
 			"symbol": "BUSDCurve"
 		},
@@ -260,7 +260,7 @@
 			"address": "0x87b008e57f640d94ee44fd893f0323af933f9195",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/COIN-icon.png",
+			"logoURI": "/assets/icons/coin.png",
 			"name": "Coin Artist",
 			"symbol": "COIN"
 		},
@@ -276,7 +276,7 @@
 			"address": "0x62359ed7505efc61ff1d56fef82158ccaffa23d7",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/CORE-icon.png",
+			"logoURI": "/assets/icons/core.png",
 			"name": "cVault.finance",
 			"symbol": "CORE"
 		},
@@ -1140,7 +1140,7 @@
 			"address": "0x459086f2376525bdceba5bdda135e4e9d3fef5bf",
 			"chainId": 1,
 			"decimals": 8,
-			"logoURI": "https://zapper.fi/images/RENBCH-icon.png",
+			"logoURI": "/assets/icons/Bitcoin_Cash.jpg",
 			"name": "renBCH",
 			"symbol": "RENBCH"
 		},
@@ -1644,7 +1644,7 @@
 			"address": "0xb1dc9124c395c1e97773ab855d66e879f053a289",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/YAX-icon.png",
+			"logoURI": "/assets/icons/yaxis.png",
 			"name": "yAxis",
 			"symbol": "YAX"
 		},
@@ -1868,7 +1868,7 @@
 			"address": "0xc25a3a3b969415c80451098fa907ec722572917f",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/sUSD Curve-icon.png",
+			"logoURI": "/assets/icons/crv.png",
 			"name": "LP-sCurve",
 			"symbol": "sUSDCurve"
 		},
@@ -1884,7 +1884,7 @@
 			"address": "0x4da27a545c0c5b758a6ba100e3a049001de870f5",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/stkAAVE-icon.png",
+			"logoURI": "/assets/icons/stakedaave_32.png",
 			"name": "StakedAave",
 			"symbol": "stkAAVE"
 		},
@@ -1932,7 +1932,7 @@
 			"address": "0x5dbcf33d8c2e976c6b560249878e6f1491bca25c",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/yUSD-icon.png",
+			"logoURI": "/assets/icons/yusd.png",
 			"name": "yUSD",
 			"symbol": "yUSD"
 		},
@@ -1972,7 +1972,7 @@
 			"address": "0x2994529c0652d127b7842094103715ec5299bbed",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "https://zapper.fi/images/ybCRV-icon.png",
+			"logoURI": "/assets/icons/bcurve.png",
 			"name": "ybCRV",
 			"symbol": "ybCRV"
 		}

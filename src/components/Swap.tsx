@@ -393,7 +393,7 @@ function Swap(props:any){
           rates: result,
           rate: result.length > 0 ? result[0] : undefined,
           showMore: false,
-          hasEnough: Number(from.value) <= Number(from.max)
+          hasEnough: Number(from.value) <= Number(from.max) && Number(from.value) > 0
         }
         //console.log(res);
         setFrom(deposit);
@@ -1231,18 +1231,18 @@ function Swap(props:any){
       <div className="row mt-4">
         <div className="col-md-6">
           <div className="card color-box">
-          <p className="card-title mt-2 mb-3">
+          <p className="card-title mb-3">
   <span className="float-right">
-    <a><img src="/assets/img/loading.png" /></a>
+    <a className="pr-1"><img src="/assets/img/loading.png" /></a>
     <a onClick={async () => {if (from && to && from.symbol && to.symbol){
         let resp = await fetchPrices(from,to);
       }}}><img src="/assets/img/refresh.png" /></a>
-    <a><img src="/assets/img/settings.png" className="pl-4" /></a>
+    <a className="pl-4"><img src="/assets/img/settings.png" /></a>
   </span>
 </p>
 
 
-          {fetchloading ? <Load loaded={loading} /> : <Fragment> <SwapCard switchHandler={switchHandler} side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
+          {fetchloading  && false? <Load loaded={loading} /> : <Fragment> <SwapCard switchHandler={switchHandler} side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
             
 
             
@@ -1315,12 +1315,16 @@ function Swap(props:any){
 
 
 
-    return <div className="d-flex" id="wrapper">
-        <Sidebar current={props.current} />
-        {html}
-        <ModalConnect show={show} setShow={setShow} />
+   
+      return fetchloading ? <Load loaded={loading} /> : <div className="d-flex" id="wrapper">
+      <Sidebar current={props.current} />
+      {html}
+      <ModalConnect show={show} setShow={setShow} />
 
 </div>
+    
+                
+    
 
 }
 

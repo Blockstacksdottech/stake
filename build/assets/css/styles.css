@@ -151,12 +151,60 @@
 }
 
 
+.btn-black {
+  background: #141417 0% 0% no-repeat padding-box !important;
+  border-radius: 5px !important;
+  color: #ffffff !important;
+}
+
+.box-green {
+  background: transparent linear-gradient(136deg, #207B69 0%, #207B6966 100%) 0% 0% no-repeat padding-box !important;
+  border-radius: 20px !important;
+  padding: 15px !important;
+}
+
+.swap-button {
+  position: absolute;
+  bottom: -25px;
+  z-index: 9;
+  cursor:pointer;
+}
+
+.pointer{
+  cursor:pointer
+}
+
+
+.search-coin {
+  border-radius: 20px !important;
+  background: transparent !important;
+  border: 1px solid #4e5159 !important;
+}
+
+
+.Curr-input {
+  width: 30%;
+  background-color: transparent;
+  outline: none;
+  border: 0px;
+  color: #ffffff;
+}
+
 .loading-card{
   width:100%;
   display:flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.loading-page{
+  width:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height:100vh;
 }
 
 .connect-modal img{
@@ -194,6 +242,9 @@
 }
 
 
+/* 
+
+
 
 .select-input-container{
   display:flex;
@@ -201,17 +252,7 @@
   justify-content: space-between;
 }
 
-.Curr-input{
-  width:40%;
-  padding:2px;
-  background-color:transparent;
-  outline:none;
-  border:0px;
-  border-bottom:2px solid rgb(163, 163, 163);
-  transition:border-bottom .5s ease;
-  color:#fff;
 
-}
 
 
 .Curr-input:hover{
@@ -240,8 +281,23 @@
 
 .coin-search input::placeholder{
   color:rgb(223, 223, 223);
+} */
+
+.css-177gid-MuiTableCell-root {
+  color: #fff !important;
 }
 
+.css-1pe4mpk-MuiButtonBase-root-MuiIconButton-root:hover {
+  background-color: transparent !important;
+}
+
+.css-1pe4mpk-MuiButtonBase-root-MuiIconButton-root {
+  color: #fff !important;
+}
+
+.farm-icon{
+  width:42px;
+}
 
 .selectcoin {
   width: 30px;
@@ -272,9 +328,9 @@
   transition: border-bottom .5s linear;
 }
 
-.selector:hover{
+/* .selector:hover{
   border-bottom:3px solid #fff;
-}
+} */
 
 
 .connectors-list li:hover{
@@ -307,7 +363,7 @@
 }
 
 .color-box {
-  background: url(../assets/img/colorful-background.jpg) no-repeat padding-box !important;
+  background: url(/assets/img/colorful-background.jpg) no-repeat padding-box !important;
   border-radius: 20px !important; 
   padding: 20px !important;
 }
@@ -11744,6 +11800,20 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+
+.css-1azl6jz-MuiTableCell-root {
+  color: #fff !important;
+}
+
+.css-1ygcj2i-MuiTableCell-root {
+  color: #fff !important;
+}
+
+.css-1ex1afd-MuiTableCell-root {
+  color: #fff !important;
+}
+
+
 #wrapper {
   overflow-x: hidden;
 }
