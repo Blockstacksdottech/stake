@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import React , {useState} from 'react';
+import React , {Fragment, useState} from 'react';
 import { Modal } from 'react-bootstrap';
 import { injected , walletconnect } from '../../wallet/connectors';
 
@@ -8,8 +8,13 @@ import { injected , walletconnect } from '../../wallet/connectors';
 function ModalConnect({show,setShow}:any){
 
     const {active , account , library , connector,activate,deactivate} = useWeb3React();
+    const [checked,setChecked] = useState(false);
     
-    
+
+    function handleChange(t:any){
+      let target = t.target;
+      setChecked(target.checked);
+    }
  
     async function connectInjected(){
         try{
@@ -41,6 +46,57 @@ function ModalConnect({show,setShow}:any){
         </Modal.Header>
         <Modal.Body className="bg-black connect-modal">
           <div>
+          {
+            checked ? 
+            <Fragment>
+              
+              <div className="mb-2">
+              <div className="row mb-3">
+                <h6>2. Connect Network</h6>
+                <div className="col-md-6 text-center">
+                  <img src="assets/img/ethereum.png" />
+                  <br />
+                  Ethereum
+                </div>
+                <div className="col-md-6 text-center disabled">
+                  <img src="assets/img/polygon.png" />
+                  <br />
+                  Polygon
+                </div>
+              </div>
+            </div>
+            
+              <div className="row">
+                <h6>3. Connect Wallet</h6>
+                <div onClick = {connectInjected} className="col-md-6 text-center">
+                  <img src="assets/img/metamask.png" />
+                  <br />
+                  Metamask
+                </div>
+                <div onClick = {connectWalletConnect} className="col-md-6 text-center">
+                  <img src="assets/img/walletconnect.png" />
+                  <br />
+                  Walletconnect
+                </div>
+              </div>
+            </Fragment>
+            
+            
+           :
+           <div className="mb-2"><div className="row mb-3">
+            <div className="col-md-12">
+              <h6>1 Accept <a>Terms of Service</a> and <a>Privacy Policy</a></h6>
+              <div className="pl-3">
+                <input type="checkbox" onChange={handleChange} checked={checked}  /> I read and accept
+              </div>
+            </div>
+          </div> </div>
+          }
+          </div>
+          
+        
+
+          {/* <div>
             <div className="mb-2">
               <div className="row">
                 <h6>1. Connect to Network</h6>
@@ -71,7 +127,7 @@ function ModalConnect({show,setShow}:any){
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* <ul className="list-group connectors-list">
                   <li onClick = {connectInjected} className="

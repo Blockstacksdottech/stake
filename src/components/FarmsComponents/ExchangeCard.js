@@ -149,6 +149,16 @@ function ExchangeCard(props){
 
     },[account,chainId])
 
+    function handleMax(val){
+      switch(val){
+        case "stake":
+          setStakedPerc(100);
+          break;
+        case "unstake":
+          setWithdrawPerc(100);
+          break;
+      }
+    }
 
 
 
@@ -160,11 +170,11 @@ function ExchangeCard(props){
         <div className="card-body">
         <p className="card-title"><label className="float-right">Wallet Balance: {formatNumber(toFixed(balance / 10**18))}</label></p>
           <div className="form-group mt-3">
-            <input id="balance" max={100} defaultValue={0} onChange={handleInpChange} type="range" className="custom-range"  />
+            <input id="balance" max={100} defaultValue={0} value={StakedPerc} onChange={handleInpChange} type="range" className="custom-range"  />
           </div>
           <div className="form-group mt-3">
             <label className="float-left text-white">Stake(%): {StakedPerc}%</label>
-            <label className="float-right badge badge-danger">MAX</label>
+            <label onClick={() => handleMax("stake")} className="float-right badge badge-danger">MAX</label>
           </div>
         </div>
         <div className="card-footer mt-4">
@@ -183,11 +193,11 @@ function ExchangeCard(props){
         <div className="card-body">
         <p className="card-title"><label className="float-right">Your stake: {formatNumber(toFixed(Staked / 10**18))}</label></p>
           <div className="form-group mt-3">
-            <input id="staked" max={100} defaultValue={0} onChange={handleInpChange} type="range" className="custom-range"  />
+            <input id="staked" max={100} value={WithdrawPerc} defaultValue={0} onChange={handleInpChange} type="range" className="custom-range"  />
           </div>
           <div className="form-group mt-3">
             <label className="float-left text-white">Withdraw(%): {WithdrawPerc}%</label>
-            <label className="float-right badge badge-danger">MAX</label>
+            <label onClick={() => handleMax("unstake")} className="float-right badge badge-danger">MAX</label>
           </div>
         </div>
         <div className="card-footer mt-4">

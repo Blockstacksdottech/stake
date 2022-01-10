@@ -26,6 +26,7 @@ import Load from './GeneralComponents/Load';
 import { selectClasses } from '@mui/material';
 import { ERC20_ABI } from '../constants/abis/erc20';
 import ConfModal from './SwapingComponents/ConfModal';
+import SwapSettings from './SwapingComponents/SwapSettings';
 
 function Swap(props:any){
 
@@ -48,6 +49,10 @@ function Swap(props:any){
     const [priceInterval,setPriceInterval]:any = useState(null);
     const [selectedRate,setSelectedRate]:any = useState(null);
     const [BuyState,setBuyState] = useState("");
+    const [openSettings,setOpenSettings] = useState(false)
+    const [slippage,setSlippage] = useState(1);
+    const [speed,setSpeed] = useState("Standard");
+    const [unlimited,setUnlimited] = useState(false);
     const [swapData,setSwapData] = useState({
       show : false,
       platform : "",
@@ -536,7 +541,6 @@ function Swap(props:any){
 
     const oneInchBuyHandler = async (deposit:any,destination:any, rate:any) => {
       try {
-        alert("1inch")
         let canExchange = false;
         let pending = false;
         setBuyState("initializing");
@@ -566,7 +570,6 @@ function Swap(props:any){
             console.log('approving')
             const maxAllowance = new BigNumber(2).pow(256).minus(1);
             await contract.methods.approve(spender, maxAllowance.toFixed(0)).send({from:account}).on('receipt',(receipt:any) =>{
-              alert('approved');
               pending = false;
               canExchange = true;
             }).on('error',(err:any) => {
@@ -701,7 +704,6 @@ function Swap(props:any){
     };
 
     const paraSwapBuyHandler = async (deposit:any,destination:any, rate:any) => {
-      alert("paraswap")
       const recipient = account;
       try {
         setBuyState("initializing");
@@ -1230,19 +1232,21 @@ function Swap(props:any){
       </div>
       <div className="row mt-4">
         <div className="col-md-6">
-          <div className="card color-box">
+
+
+        {openSettings ? <SwapSettings setOpenSettings={setOpenSettings} slip={[slippage,setSlippage]} speed={[speed,setSpeed]} unlimited={[unlimited,setUnlimited]} />  : <div className="card color-box">
           <p className="card-title mb-3">
   <span className="float-right">
     <a className="pr-1"><img src="/assets/img/loading.png" /></a>
     <a onClick={async () => {if (from && to && from.symbol && to.symbol){
         let resp = await fetchPrices(from,to);
       }}}><img src="/assets/img/refresh.png" /></a>
-    <a className="pl-4"><img src="/assets/img/settings.png" /></a>
+    <a onClick={() => setOpenSettings(true)} className="pl-4"><img src="/assets/img/settings.png" /></a>
   </span>
 </p>
 
 
-          {fetchloading  && false? <Load loaded={loading} /> : <Fragment> <SwapCard switchHandler={switchHandler} side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
+          {fetchloading ? <Load loaded={loading} /> : <Fragment> <SwapCard switchHandler={switchHandler} side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
             
 
             
@@ -1257,7 +1261,17 @@ function Swap(props:any){
             }
               
 </button>
-          </div>
+          </div> }
+
+
+          
+
+
+
+
+
+
+
         </div>
         <div className="col-md-6">
           <div className="table-responsive">
@@ -1272,7 +1286,7 @@ function Swap(props:any){
                     if (i == 0){
                       return(
                         <tr key={i} onClick={() => { setRate(i)}} className="offers">
-                  <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.source}</td>
+                  <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.platform}</td>
                   <td>{e.rate}</td>
                   <td className="text-green">BEST</td>
                 </tr>
@@ -1280,7 +1294,7 @@ function Swap(props:any){
                     }else{
                       return(
                         <tr key={i} onClick={() => { setRate(i)}} className="offers">
-                  <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.source}</td>
+                  <td><img src={"assets/media/dex/"+dexes[e.platform]} /> {e.platform}</td>
                   <td>{e.rate}</td>
                   <td className="text-red">{round((e.rate - result.rate.rate)/result.rate.rate)}%</td>
                 </tr>
@@ -1316,7 +1330,7 @@ function Swap(props:any){
 
 
    
-      return fetchloading ? <Load loaded={loading} /> : <div className="d-flex" id="wrapper">
+      return fetchloading  && false? <Load loaded={loading} /> : <div className="d-flex" id="wrapper">
       <Sidebar current={props.current} />
       {html}
       <ModalConnect show={show} setShow={setShow} />
