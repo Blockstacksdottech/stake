@@ -24,6 +24,10 @@ import { ERC20_ABI } from '../constants/abis/erc20';
 import OneInchAbi from "../constants/1inchfarm.json";
 import MooniSwapAbi from "../constants/mooniswap.json";
 
+import { Infura_API } from '../constants';
+
+import Web3 from 'web3';
+
 
 
 
@@ -34,7 +38,16 @@ function Farm(props:any){
 
   
 
-  async function FormatOneInchFarms(data:any){
+  async function FormatOneInchFarms(data:any,provider:any=null){
+    console.log('provider')
+    console.log(provider)
+    var w3;
+    if (provider){
+      w3 = new Web3(provider);
+    }else{
+      w3 = library;
+    }
+    console.log(w3);
       let cont = []
       for (let farm of data){
         let res = {
@@ -46,23 +59,31 @@ function Farm(props:any){
           liquidity : 0,
           data : {}
         }
-        let OneInchContract = loadContract(library,OneInchAbi,farm.address);
+        let OneInchContract = loadContract(w3,OneInchAbi,farm.address);
         let mooniAddress = await OneInchContract.methods.mooniswap().call();
         let staked = 0;
         for (let stake of farm.stakeCoins){
           let rate = await getPriceCoin(stake.id);
-          let CoinContract = loadContract(library,ERC20_ABI,stake.address);
+          let CoinContract = loadContract(w3,ERC20_ABI,stake.address);
           let balance = await CoinContract.methods.balanceOf(mooniAddress).call();
           let decimals = await CoinContract.methods.decimals().call();
           staked += ((Number(balance) / (10**Number(decimals))) * rate);
         }
         staked = round(staked);
-        let rewardContract = loadContract(library,ERC20_ABI,farm.rewardToken.address);
+        let rewardContract = loadContract(w3,ERC20_ABI,farm.rewardToken.address);
         res.liquidity = staked;
         let decimals = await rewardContract.methods.decimals().call();
-        let reward_rate = await getPriceCoin(farm.rewardToken.id);
-        let earn =  await OneInchContract.methods.earned(farm.rewardToken['1inch_id'],account).call();
-        res.earned = ((Number(earn) / (10**Number(decimals)))) * reward_rate;
+        let earn;
+        if (account) {
+          let reward_rate = await getPriceCoin(farm.rewardToken.id);
+          earn =  await OneInchContract.methods.earned(farm.rewardToken['1inch_id'],account).call();
+          res.earned = ((Number(earn) / (10**Number(decimals)))) * reward_rate;
+        }else{
+          earn = 0;
+          res.earned = earn;
+        }
+        
+        
         
         let balance = await rewardContract.methods.balanceOf(farm.address).call();
         let totalSupply = await OneInchContract.methods.totalSupply().call();
@@ -85,11 +106,19 @@ function Farm(props:any){
 
   useEffect(() => {
     async function loadData(){
-      if (active && chainId && library){
-        if (farmsContainer[chainId]){
-          await FormatOneInchFarms(farmsContainer[chainId]['1inch']);
+      
+        if (active && chainId && library){
+          if (farmsContainer[chainId]){
+            await FormatOneInchFarms(farmsContainer[chainId]['1inch']);
+          }
+        }else{
+          if (farmsContainer[1]){
+            console.log(Infura_API)
+            await FormatOneInchFarms(farmsContainer[1]['1inch'],Infura_API);
+          }
         }
-      }
+        
+      
     }
 
     loadData().then(res=> {

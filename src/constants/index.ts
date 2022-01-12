@@ -13,6 +13,7 @@ export const BTC = {
 };
 
 
+export const Infura_API =  process.env.INFURA_URL || "https://mainnet.infura.io/v3/5943806f71034503bbbb49413ffbbe15";
 
 export const CHANGE_NOW_FLOW = process.env.REACT_APP_CHANGE_NOW_FLOW || 'standard';
 

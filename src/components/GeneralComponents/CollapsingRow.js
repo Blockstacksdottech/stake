@@ -15,7 +15,7 @@ import IconButton from '@mui/material/IconButton';
 import {formatNumber} from "../../utils/index";
 import { format } from 'path';
 import ExchangeCard from '../FarmsComponents/ExchangeCard';
-
+import { useWeb3React } from '@web3-react/core';
 
 
 
@@ -25,6 +25,7 @@ import ExchangeCard from '../FarmsComponents/ExchangeCard';
 function CollapsingRow(props) {
     const { row } = props;
     const [open, setOpen] = React.useState(false);
+    const {account , active ,chainId, library} = useWeb3React();
   
     return (
       <React.Fragment>
@@ -48,13 +49,16 @@ function CollapsingRow(props) {
             </IconButton>
           </TableCell>
         </TableRow>
-        <TableRow>
+        {
+          account && active ? <TableRow>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <ExchangeCard data={row} />
             </Collapse>
           </TableCell>
-        </TableRow>
+        </TableRow> : ""
+        }
+        
       </React.Fragment>
     );
   }
