@@ -12,7 +12,7 @@
 			"address": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "/assets/icons/aave.jpg",
+			"logoURI": "/assets/icons/aave.png",
 			"name": "Aave",
 			"symbol": "AAVE"
 		},
@@ -140,7 +140,7 @@
 			"address": "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c",
 			"chainId": 1,
 			"decimals": 18,
-			"logoURI": "bnt.png",
+			"logoURI": "/assets/icons/bnt.png",
 			"name": "Bancor Network Token",
 			"symbol": "BNT"
 		},

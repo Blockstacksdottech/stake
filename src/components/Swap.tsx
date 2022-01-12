@@ -95,6 +95,7 @@ function Swap(props:any){
 
     async function handleSelect(i:number){
       let temp = {...tokens[i],value:0,max:0};
+      setCurrShow(false);
       let resp;
       if (side == "from"){
         setFrom(temp);
@@ -109,7 +110,7 @@ function Swap(props:any){
       }
         
       }
-      setCurrShow(false);
+      
 
     }
 
@@ -1246,7 +1247,7 @@ function Swap(props:any){
 </p>
 
 
-          {fetchloading ? <Load loaded={loading} /> : <Fragment> <SwapCard switchHandler={switchHandler} side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
+          {fetchloading && false ? <Load loaded={loading} /> : <Fragment> <SwapCard switchHandler={switchHandler} side="from" val={from ? from.value : 0} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} handleValue={handleValue} address = {from ? from.address : null}  selected={from} from={from} to={to} />  <SwapCard side="to" val={from ? from.value : 0} rate={selectedRate} address={to ? to.address : null} onChangeBalance={onChangeBalance} setSide={setSide} show={currShow} setShow={setCurrShow} hanleValue={handleValue} selected={to} from={from} to={to} /> </Fragment>}
             
 
             
@@ -1275,7 +1276,7 @@ function Swap(props:any){
         </div>
         <div className="col-md-6">
           <div className="table-responsive">
-            <table className="table table-striped table-dark">
+            { fetchloading ? <Load loaded={loading} /> :  <table className="table table-striped table-dark">
               <tbody>
 
                 {
@@ -1302,12 +1303,9 @@ function Swap(props:any){
                     }
                   }) : ""
                 }
-
-
-                
-                
               </tbody>
-            </table>
+            </table>}
+            
           </div>
         </div>
       </div>

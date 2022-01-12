@@ -66,7 +66,7 @@ function SwapCard(props:any){
       <p className="card-title">
         {props.selected ? <small>{props.selected.name}</small> : "" }
          
-        {props.from && props.to && props.side != "from" ? <small className="float-right">1 {props.from.symbol} ~= {props.rate.rate} {props.to.symbol}</small> :   ""}
+        {props.from && props.rate && props.to && props.side != "from" ? <small className="float-right">1 {props.from.symbol} ~= {props.rate.rate} {props.to.symbol}</small> :   ""}
         
       </p>
 

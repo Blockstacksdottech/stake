@@ -1,4 +1,5 @@
 import React from 'react'
+import Switch from '@mui/material/Switch';
 
 export default function SwapSettings(props:any) {
 
@@ -71,9 +72,14 @@ export default function SwapSettings(props:any) {
       <div className="mt-3">
         <span className="plighttext">Allowance</span>
         <span className="plighttext float-right">Unlimited</span>
-        <div className="mt-1">
+        {/* <div className="mt-1">
           <input checked={unlimited} onChange={handleChecked} type="checkbox" defaultChecked data-toggle="toggle" data-size="sm" data-on="Unlimited" data-off="Limited" data-style="ios" />
+        </div> */}
+        <div className="mt-1">
+        <Switch checked={unlimited} onChange={handleChecked}  />
         </div>
+
+
       </div>
       {/* <div className="mt-3">
         <span className="plighttext">Estimated Gas Fee</span>

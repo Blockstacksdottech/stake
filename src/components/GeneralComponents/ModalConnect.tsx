@@ -40,9 +40,9 @@ function ModalConnect({show,setShow}:any){
           <h4 className="modal-title" id="exampleModalLabel">
             Select Wallet
           </h4>
-          {/* <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+           <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span>
-                </button> */}
+                </button>
         </Modal.Header>
         <Modal.Body className="bg-black connect-modal">
           <div>
@@ -53,30 +53,26 @@ function ModalConnect({show,setShow}:any){
               <div className="mb-2">
               <div className="row mb-3">
                 <h6>2. Connect Network</h6>
-                <div className="col-md-6 text-center">
+                <div className="col">
                   <img src="assets/img/ethereum.png" />
-                  <br />
-                  Ethereum
+                  <p className="mt-1">Ethereum</p>
                 </div>
-                <div className="col-md-6 text-center disabled">
+                <div className="col disabled">
                   <img src="assets/img/polygon.png" />
-                  <br />
-                  Polygon
+                  <p className="mt-1">Polygon</p>
                 </div>
               </div>
             </div>
             
               <div className="row">
                 <h6>3. Connect Wallet</h6>
-                <div onClick = {connectInjected} className="col-md-6 text-center">
+                <div onClick = {connectInjected} className="col">
                   <img src="assets/img/metamask.png" />
-                  <br />
-                  Metamask
+                  <p className="mt-1">Metamask</p>
                 </div>
-                <div onClick = {connectWalletConnect} className="col-md-6 text-center">
+                <div onClick = {connectWalletConnect} className="col">
                   <img src="assets/img/walletconnect.png" />
-                  <br />
-                  Walletconnect
+                  <p className="mt-1">Walletconnect</p>
                 </div>
               </div>
             </Fragment>
